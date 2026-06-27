@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anamnesi Guiada · SEM CECOS</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #F0F4F8;
+  color: #1A2530;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+h1,h2,h3,h4,h5,h6,p,span,div,button,input,label,textarea,select,a {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* HEADER */
+header { background: #C0392B; color: #fff; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.hdr { display: flex; align-items: center; gap: 14px; padding: 10px 20px; max-width: 1100px; margin: 0 auto; }
+.hdr-logo { background: white; border-radius: 6px; padding: 4px 8px; display: flex; align-items: center; height: 40px; }
+.hdr-logo img { height: 30px; width: auto; display: block; }
+.hdr-mid { flex: 1; }
+.hdr-title { font-size: 15px; font-weight: 700; }
+.hdr-sub { font-size: 11px; opacity: .75; }
+.hdr-right { display: flex; gap: 8px; align-items: center; }
+.hdr-btn { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); color: white; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+.hdr-btn:hover { background: rgba(255,255,255,.25); }
+
+/* LAYOUT */
+.layout { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 275px 1fr; gap: 14px; align-items: start; }
+.sidebar { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 68px; }
+.main { display: flex; flex-direction: column; gap: 12px; }
+
+/* CARDS */
+.card { background: #fff; border-radius: 10px; border: 1px solid #E2E8F0; overflow: hidden; }
+.card-head { padding: 9px 14px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #4A5568; display: flex; align-items: center; gap: 6px; }
+
+/* NIVELL DISPLAY */
+.niv-box { padding: 12px; border-radius: 8px; border: 2px solid #E2E8F0; text-align: center; transition: all .25s; }
+.niv-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #718096; margin-bottom: 4px; }
+.niv-code { font-size: 26px; font-weight: 900; color: #718096; }
+.niv-desc { font-size: 11px; color: #718096; margin-top: 3px; }
+.niv-conf-btn { width: 100%; margin-top: 10px; padding: 9px; background: #F5A800; color: #4A3300; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; display: none; }
+.niv-conf-btn:hover { background: #C98D00; color: #fff; }
+.niv-note { margin-top: 6px; font-size: 10px; color: #718096; text-align: center; }
+
+/* PROGRESS */
+.prog-list { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; }
+.prog-item { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 5px 6px; border-radius: 5px; cursor: pointer; transition: background .1s; color: #718096; }
+.prog-item:hover { background: #F8FAFC; }
+.prog-item.p-active { background: #EBF5FB; color: #0C447C; font-weight: 600; }
+.prog-item.p-done { color: #1E8449; }
+.prog-dot { width: 8px; height: 8px; border-radius: 50%; background: #CBD5E0; flex-shrink: 0; }
+.prog-item.p-active .prog-dot { background: #2980B9; }
+.prog-item.p-done .prog-dot { background: #1E8449; }
+
+/* FLAG ALERT */
+.flag-alert { margin: 0 12px 8px; padding: 8px 10px; background: #FDECEA; border: 1px solid #f5c6c6; border-radius: 6px; font-size: 11px; color: #7B1010; display: none; }
+
+/* MOTIU GRID */
+.motiu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; padding: 12px; }
+.motiu-btn { border: 1px solid #E2E8F0; background: #fff; border-radius: 8px; padding: 12px 8px; cursor: pointer; text-align: center; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: 5px; font-family: inherit; }
+.motiu-btn:hover { border-color: #F5A800; background: #FFF8E7; }
+.motiu-btn.sel { border-color: #C0392B; background: #FDECEA; }
+.motiu-icon { font-size: 24px; line-height: 1; }
+.motiu-nom { font-size: 11px; font-weight: 600; color: #1A2530; line-height: 1.3; }
+.motiu-btn.sel .motiu-nom { color: #C0392B; }
+
+/* SECTIONS */
+.sec-card { display: none; }
+.sec-card.vis { display: block; }
+.sec-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; cursor: pointer; user-select: none; }
+.sec-header:hover { background: #EEF2F7; }
+.sec-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; }
+.b-vital { background: #FDECEA; color: #7B1010; border: 1px solid #f5c6c6; }
+.b-opqrst { background: #EBF5FB; color: #0C447C; border: 1px solid #90c8f0; }
+.b-ample { background: #EAF6EE; color: #0f5230; border: 1px solid #8fdcac; }
+.b-flags { background: #FEF0E6; color: #7D3500; border: 1px solid #f8c89a; }
+.sec-title { font-size: 13px; font-weight: 700; flex: 1; color: #1A2530; }
+.sec-sub { font-size: 11px; color: #718096; }
+.sec-arrow { color: #718096; font-size: 16px; transition: transform .2s; }
+.sec-card.collapsed .sec-arrow { transform: rotate(-90deg); }
+.sec-card.collapsed .sec-body { display: none; }
+.sec-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+
+/* VITAL Q */
+.vital-q { border: 1px solid #f5c6c6; border-radius: 8px; overflow: hidden; background: #FDECEA; }
+.vital-head { padding: 9px 12px; display: flex; align-items: flex-start; gap: 8px; }
+.vital-q-text { font-size: 13px; font-weight: 700; color: #7B1010; flex: 1; }
+.vital-alerta { font-size: 10px; color: #96281B; font-style: italic; margin-top: 2px; }
+.vital-opts { display: flex; gap: 6px; padding: 4px 12px 10px; }
+.vital-btn { flex: 1; padding: 7px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid; cursor: pointer; font-family: inherit; transition: all .15s; }
+.v-si { background: #EAF6EE; border-color: #8fdcac; color: #0f5230; }
+.v-no { background: #EAF6EE; border-color: #8fdcac; color: #0f5230; }
+.v-si-flag { background: #FDECEA; border-color: #f5c6c6; color: #7B1010; }
+.v-no-flag { background: #FDECEA; border-color: #f5c6c6; color: #7B1010; }
+.vital-btn.actiu { background: #C0392B; color: #fff; border-color: #C0392B; }
+.vital-btn.actiu-ok { background: #1E8449; color: #fff; border-color: #1E8449; }
+
+/* OPT PREGUNTES */
+.preg-block { border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; }
+.preg-head { padding: 9px 12px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; display: flex; align-items: flex-start; gap: 8px; }
+.preg-lletra { width: 28px; height: 28px; border-radius: 6px; background: #EBF5FB; color: #0C447C; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #90c8f0; }
+.preg-lletra-a { background: #EAF6EE; color: #0f5230; border-color: #8fdcac; }
+.preg-q { font-size: 13px; font-weight: 700; color: #1A2530; }
+.preg-hint { font-size: 11px; color: #718096; font-style: italic; margin-top: 2px; }
+.preg-opts { display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; }
+.opt-btn { text-align: left; padding: 8px 12px; border-radius: 6px; border: 1px solid #E2E8F0; background: #fff; cursor: pointer; font-size: 12px; font-weight: 500; color: #1A2530; font-family: inherit; transition: all .15s; display: flex; align-items: flex-start; gap: 8px; width: 100%; }
+.opt-btn:hover { border-color: #CBD5E0; background: #F8FAFC; }
+.opt-btn.o-sel { border-color: #2980B9; background: #EBF5FB; color: #0C447C; }
+.opt-btn.o-flag { border-color: #C0392B; background: #FDECEA; color: #7B1010; }
+.opt-nota { font-size: 10px; color: #718096; font-style: italic; margin-top: 3px; display: block; }
+.opt-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* FLAGS */
+.flag-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-bottom: 1px solid #E2E8F0; cursor: pointer; transition: background .1s; }
+.flag-row:last-child { border-bottom: none; }
+.flag-row:hover { background: #FFF8E7; }
+.flag-cb { width: 16px; height: 16px; cursor: pointer; accent-color: #C0392B; flex-shrink: 0; margin-top: 2px; }
+.flag-txt { font-size: 12px; color: #1A2530; flex: 1; line-height: 1.4; }
+.flag-nota-txt { font-size: 10px; color: #7D3500; font-style: italic; display: block; margin-top: 2px; }
+.flag-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+.p-n1 { background: #FDECEA; color: #7B1010; border: 1px solid #f5c6c6; }
+.p-n2 { background: #FEF0E6; color: #7D3500; border: 1px solid #f8c89a; }
+
+/* INFO BOXES */
+.info-box { padding: 9px 12px; border-radius: 6px; font-size: 11px; display: flex; gap: 8px; line-height: 1.5; }
+.i-danger { background: #FDECEA; border: 1px solid #f5c6c6; color: #7B1010; }
+.i-warn { background: #FFF8E7; border: 1px solid #FAD07A; color: #4A3300; }
+.i-info { background: #EBF5FB; border: 1px solid #90c8f0; color: #0C447C; }
+
+/* RESUM */
+.resum-item { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.resum-label { color: #718096; min-width: 90px; flex-shrink: 0; }
+.resum-val { color: #1A2530; font-weight: 600; }
+
+/* ACCIONS */
+.accions { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-top: 1px solid #E2E8F0; background: #F8FAFC; }
+.btn-p { background: #F5A800; color: #4A3300; border: none; border-radius: 6px; padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-p:hover { background: #C98D00; color: #fff; }
+.btn-s { background: #fff; color: #4A5568; border: 1px solid #E2E8F0; border-radius: 6px; padding: 7px 14px; font-size: 12px; cursor: pointer; font-family: inherit; }
+.btn-s:hover { border-color: #CBD5E0; }
+
+/* WELCOME */
+.welcome { padding: 40px 20px; text-align: center; color: #718096; }
+.welcome-icon { font-size: 48px; margin-bottom: 10px; }
+.welcome-title { font-size: 16px; font-weight: 700; color: #1A2530; margin-bottom: 5px; }
+.welcome-text { font-size: 13px; max-width: 360px; margin: 0 auto; }
+
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="hdr-logo"><img src="data:image/png;base64,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sNehiIOHXTKQWbNO5Ybrr+fb3/4O6UyK+voGXNelurqGO++8c4fzzz33HMaPH88LL7yAlJIzzziT+a/PJ+JFEFLQ3NxMeXk5v/71r7n++ut59NHH+q694YbrefWVVygtLWVzaysVFRWsWb2a8RMm8PzzL+zQ12c+cxMLFiygpCROU1MT3V3deBGPY445liDwaWxsJBaLMXfuPI49diZz587ru9YYw6JFixk6dMjympqaD2qtf2yMOU8IcdXSpct+OnTo0J2ux3sveA8L3niDCRMmsH37dhoaRuA4DkOHDuGnP/1Z33lHHXUkF154IQ8//DA9PT3U19ejjWZkw0haWzcjBMZ13S7P89qBTsiTylmzTuWrX/kqX/zSF0mlUtTV1eE6LtU11fzmN78F4Oavf503Fr7B4MGDWbp0KR0dHdQNr2P58uUcd/xx3HffX/foxp97ztnEYnFWr1lNPB5n3rxXOO/cc/CDgCAIaGtro6amhgULXufss8/hD3/4IyCYefQx/OEPv391eF3d+40xP8OYK4Gnt7S23jN82PB+fZx99ln09vYSiUTYtnUr2Ww2dyhinz0TB6SU0ndddzsICSSFAGPg4osvYtWqlZSVldPV1UVtbS1KKaZOncr//d9t+/Xgn3D88UydNo1XX30FrRSjx4zBGEP14Gp+dccdAPz3177G8reW47ouK1euIJlMMaKhgc7OLg6Zegh33HHnfo1hf5H8y0OYTPaN9ENPVUdOnnmFcF0ixx91QeycU/GmTiJYu/75zBPPzk7d+6iL1v+J556EMYPQGnfyeGLnn46QgvScl/Dnv3kEUl6A43Srtevnptau/0PsgjOfi51/+nWJj115WvDWqtHpR54+W1SW49QPI/3InEzw1urX2y762B7z+oaGOozRCCF3ctTuLqRUrFvXclDX9UCioaEBUOzaWtD/9+bmDQd7yHuFHWZ19NFH0draSmlpgp6eXtatW48xhuHDh1FeXk5JSRwhBK+//gbTp0/rIxCJkhK2btvK+vV2AUaObCAWs+emUknWrWsGYMyYUVRUVJLNZPAiEXzfx3EcUskk29raeObJpznm+GNoaBhBLBYlk8kipSSRSNDZ2YkxGsdxcByX9evX88XP/xf/ffMtXPuxj/HiSy/S1tbG5s2tuK7D6NGjEEKiVBBO1T7qiZIEnueRSqWorqkZnEql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" alt="SEM"></div>
+    <div class="hdr-mid">
+      <div class="hdr-title">Anamnesi Guiada &middot; CDSS Telef&ograve;nic</div>
+      <div class="hdr-sub">Suport cognitiu per a infermers CECOS &middot; SEM Catalunya</div>
+    </div>
+    <div class="hdr-right">
+      <a href="index.html" class="hdr-btn">&larr; Triatge</a>
+      <a href="rcp.html" target="_blank" class="hdr-btn">&#10084;&#65039; RCP</a>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+
+    <div class="card">
+      <div class="card-head">&#9650; Nivell suggerit pel CDSS</div>
+      <div style="padding:10px">
+        <div class="niv-box" id="nivBox">
+          <div class="niv-label" id="nivLabel">Pendent d&apos;anamnesi</div>
+          <div class="niv-code" id="nivCode">&mdash;</div>
+          <div class="niv-desc" id="nivDesc">Respon les preguntes per obtenir el suggeriment</div>
+        </div>
+        <button class="niv-conf-btn" id="nivConfBtn">&#10003; Confirmar i assignar nivell</button>
+        <div class="niv-note">La decisi&oacute; final &eacute;s de l&apos;infermer CECOS</div>
+      </div>
+    </div>
+
+    <div class="flag-alert" id="flagAlert">
+      &#128680; <strong>Signe d&apos;alarma:</strong> <span id="flagMsg"></span>
+    </div>
+
+    <div class="card">
+      <div class="card-head">&#128203; Progr&eacute;s de l&apos;anamnesi</div>
+      <div class="prog-list" id="progList"></div>
+    </div>
+
+    <div class="card" id="resumCard" style="display:none">
+      <div class="card-head">&#128196; Resum de la trucada</div>
+      <div style="padding:12px" id="resumBody"></div>
+      <div class="accions">
+        <button class="btn-p" id="btnCopiar">&#128203; Copiar resum</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <main class="main">
+
+    <div class="card">
+      <div class="card-head">&#128269; Selecciona el motiu de consulta</div>
+      <div class="info-box i-info" style="margin:10px 12px 0">
+        &#8505;&#65039; <span>Estructurat seguint <strong>ABCDE &rarr; OPQRST &rarr; AMPLE &rarr; Red Flags</strong> (model MBS suec, Holmstr&ouml;m et al. 2020). No &eacute;s un script: guia l&apos;anamnesi, la decisi&oacute; cl&iacute;nica &eacute;s teva.</span>
+      </div>
+      <div class="motiu-grid" id="motiuGrid"></div>
+    </div>
+
+    <div id="anamArea">
+      <div class="card">
+        <div class="welcome">
+          <div class="welcome-icon">&#127919;</div>
+          <div class="welcome-title">Selecciona el motiu de consulta</div>
+          <div class="welcome-text">Apareixeran les preguntes guiades organitzades per fases cl&iacute;niques: descart vital, OPQRST, AMPLE i signes d&apos;alarma.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── DADES ────────────────────────────────────────────────────────────────────
+const ANAMNESI = {
+  "estructura": {
+    "fases": ["descartar_vital", "opqrst", "ample", "red_flags"],
+    "nota": "CDSS estructurat seguint MBS suec (ABCDE/OPQRST/AMPLE). No és un script tancat: l'infermer guia la conversa."
+  },
+  "motius": {
+    "pcr": {
+      "nom": "No respira / PCR",
+      "skip_anamnesi": true,
+      "accio_directa": "Obre mòdul RCP guiada"
+    },
+    "dispnea": {
+      "nom": "Dificultat per respirar",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Pot parlar frases senceres sense aturar-se?", "si": null, "no": "N1", "alerta": "No pot parlar → N1 immediatament" },
+        { "id": "dv2", "q": "Té els llavis o les ungles de color blau o lila (cianosi)?", "si": "N1", "no": null, "alerta": "Cianosi = N1" },
+        { "id": "dv3", "q": "Fa sorolls estranys en respirar (xiulet, estridor, gorgoteig)?", "si": "N1", "no": null, "alerta": "Sons respiratoris anormals = N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Quan ha començat la dificultat per respirar?", "hint": "Sobtada (<minuts) vs gradual (hores/dies)", "opcions": [
+          { "label": "Sobtada, fa menys d'1 hora", "pes": 2, "flag": "N1" },
+          { "label": "Gradual en hores", "pes": 1, "flag": "N2" },
+          { "label": "Dies, empitjorant progressivament", "pes": 1, "flag": "N2" },
+          { "label": "Crònica, igual que sempre", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "p1", "lletra": "P", "nom": "Provocació", "q": "Millora o empitjora amb alguna postura o activitat?", "hint": "Ortopnea (empitjora estirat) → insuficiència cardíaca", "opcions": [
+          { "label": "Empitjora estirat, millora assegut (ortopnea)", "pes": 2, "flag": "N2", "nota": "Sospita edema agut de pulmó" },
+          { "label": "Empitjora amb l'esforç", "pes": 1, "flag": "N2" },
+          { "label": "Empitjora inspirant fondo (pleurític)", "pes": 1, "flag": "N2" },
+          { "label": "No canvia amb la postura", "pes": 0, "flag": null }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Qualitat", "q": "Com descriuria la dificultat? Sensació de pes, de no poder omplir els pulmons, d'ofec...?", "hint": "", "opcions": [
+          { "label": "Sensació d'ofec intens, no pot omplir els pulmons", "pes": 2, "flag": "N1" },
+          { "label": "Opressió al pit amb la dispnea", "pes": 2, "flag": "N1", "nota": "Descartar SCA + EPA" },
+          { "label": "Xiulet en expirar (sibil·lants)", "pes": 1, "flag": "N2", "nota": "Possible asma o MPOC" },
+          { "label": "Tos seca i dificultat lleugera", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Severitat", "q": "En una escala de 0 a 10, com de greu és la dificultat per respirar ara mateix?", "hint": "0 = cap dificultat, 10 = no pot respirar gens", "opcions": [
+          { "label": "8 - 10 (molt greu, dificultats extremes)", "pes": 3, "flag": "N1" },
+          { "label": "5 - 7 (important, limita l'activitat)", "pes": 2, "flag": "N2" },
+          { "label": "3 - 4 (moderada, pot parlar)", "pes": 1, "flag": "N3" },
+          { "label": "1 - 2 (lleu, nota alguna dificultat)", "pes": 0, "flag": "N4" }
+        ]},
+        { "id": "t1", "lletra": "T", "nom": "Temps", "q": "Ha tingut episodis semblants anteriorment?", "hint": "Antecedent d'asma, MPOC, EPA previ orienta el diagnòstic", "opcions": [
+          { "label": "No, és la primera vegada", "pes": 2, "flag": "N2" },
+          { "label": "Sí, té asma o MPOC diagnosticat", "pes": 1, "flag": "N2", "nota": "Ha pres el broncodilatador?" },
+          { "label": "Sí, episodis d'insuficiència cardíaca", "pes": 2, "flag": "N2" },
+          { "label": "Sí, episodis similars però menys greus", "pes": 0, "flag": "N3" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Al·lèrgies", "q": "Té al·lèrgies conegudes? Ha pres res nou recentment?", "opcions": [
+          { "label": "Sí, al·lèrgia coneguda i possible exposició", "pes": 2, "flag": "N1", "nota": "Possible anafilàxia" },
+          { "label": "No al·lèrgies conegudes", "pes": 0, "flag": null }
+        ]},
+        { "id": "m1", "lletra": "M", "nom": "Medicació", "q": "Pren inhaladors, diürètics, betabloquejants o anticoagulants?", "opcions": [
+          { "label": "Sí, inhaladors (asma/MPOC)", "pes": 1, "flag": null, "nota": "Ha pres la medicació habitual avui?" },
+          { "label": "Sí, diürètics (insuficiència cardíaca)", "pes": 1, "flag": "N2" },
+          { "label": "Sí, betabloquejants", "pes": 1, "flag": null, "nota": "Possible broncoespasme per betabloquejants" },
+          { "label": "No medicació rellevant", "pes": 0, "flag": null }
+        ]},
+        { "id": "e1", "lletra": "E", "nom": "Esdeveniments", "q": "Ha tingut febre, tos o ha estat en contacte amb malalts els últims dies?", "opcions": [
+          { "label": "Sí, febre i tos (possible infecció resp.)", "pes": 1, "flag": "N3" },
+          { "label": "Sí, ha viatjat o immobilitzat (TEP?)", "pes": 2, "flag": "N2", "nota": "Descartar tromboembolisme pulmonar" },
+          { "label": "No, cap d'aquests", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Suoración freda associada?", "flag": "N1", "nota": "Signe vagal + dispnea = emergència" },
+        { "id": "rf2", "q": "Dolor al pit associat a la dificultat respiratòria?", "flag": "N1", "nota": "SCA + EPA = N1" },
+        { "id": "rf3", "q": "Ha tingut una caiguda o traumatisme toràcic recent?", "flag": "N1", "nota": "Possible pneumotòrax traumàtic" },
+        { "id": "rf4", "q": "La dificultat ha aparegut just després d'una punxada d'insecte, medicació o menjar?", "flag": "N1", "nota": "Anafilàxia" }
+      ]
+    },
+    "dolor_pit": {
+      "nom": "Dolor al pit",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Té sudoració freda i malestar general intens?", "si": "N1", "no": null, "alerta": "Sudoració + dolor pit = IAM fins a prova del contrari" },
+        { "id": "dv2", "q": "Perd el coneixement o es nota molt dèbil?", "si": "N1", "no": null, "alerta": "Síncope + dolor pit = N1" },
+        { "id": "dv3", "q": "Té dificultat per respirar important?", "si": "N1", "no": null, "alerta": "Dolor pit + dispnea = N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Quan ha aparegut el dolor? Estava fent alguna activitat?", "opcions": [
+          { "label": "En repòs, de cop, fa menys d'1 hora", "pes": 3, "flag": "N1" },
+          { "label": "Durant un esforç físic", "pes": 2, "flag": "N1", "nota": "Angina d'esforç o IAM" },
+          { "label": "Progressiu en hores/dies", "pes": 1, "flag": "N2" },
+          { "label": "Fa dies, intermitent", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "p1", "lletra": "P", "nom": "Provocació / Pal·liació", "q": "El dolor millora o empitjora amb alguna cosa? (postura, respiració, pressió)", "opcions": [
+          { "label": "Empitjora en inspirar fondo (pleurític)", "pes": 1, "flag": "N2", "nota": "Possible TEP, pleuritis, pericarditis" },
+          { "label": "Empitjora en moure's o palpar (musculoesquelètic)", "pes": 0, "flag": "N4" },
+          { "label": "No varia amb res (visceral)", "pes": 2, "flag": "N1", "nota": "Dolor visceral = origen cardíac probable" },
+          { "label": "Millora amb antiàcids", "pes": 0, "flag": "N3", "nota": "Possible origen digestiu" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Qualitat", "q": "Com descriuria el dolor? (opressiu, punxant, cremor, pes...)", "opcions": [
+          { "label": "Opressiu, com un pes o pressió al pit", "pes": 3, "flag": "N1", "nota": "Dolor coronari típic" },
+          { "label": "Cremor darrere l'esternó", "pes": 2, "flag": "N2", "nota": "Pot ser coronari o esofàgic" },
+          { "label": "Punxant, localitzat", "pes": 0, "flag": "N3" },
+          { "label": "Difús, difícil de localitzar", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "r1", "lletra": "R", "nom": "Radiació", "q": "El dolor s'escampa a alguna altra zona del cos?", "opcions": [
+          { "label": "Sí, al braç esquerre o als dos braços", "pes": 3, "flag": "N1", "nota": "Irradiació clàssica IAM" },
+          { "label": "Sí, a la mandíbula o el coll", "pes": 3, "flag": "N1", "nota": "Irradiació típica SCA" },
+          { "label": "Sí, a l'esquena (interescapular)", "pes": 2, "flag": "N1", "nota": "Descartar dissecció aòrtica" },
+          { "label": "No, localitzat al pit", "pes": 0, "flag": null }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Severitat", "q": "Intensitat del dolor de 0 a 10:", "opcions": [
+          { "label": "8 - 10 (insuportable)", "pes": 3, "flag": "N1" },
+          { "label": "5 - 7 (intens, molt molest)", "pes": 2, "flag": "N2" },
+          { "label": "3 - 4 (moderat, tolerable)", "pes": 1, "flag": "N3" },
+          { "label": "1 - 2 (lleu)", "pes": 0, "flag": "N4" }
+        ]},
+        { "id": "t1", "lletra": "T", "nom": "Temps", "q": "Fa quant temps que dura el dolor sense cedir?", "opcions": [
+          { "label": "Menys de 30 minuts", "pes": 3, "flag": "N1", "nota": "Finestra terapèutica IAM" },
+          { "label": "30 minuts - 6 hores", "pes": 2, "flag": "N1" },
+          { "label": "6 - 24 hores", "pes": 1, "flag": "N2" },
+          { "label": "Més de 24 hores, intermitent", "pes": 0, "flag": "N3" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Antecedents cardíacs", "q": "Té historial de malaltia cardíaca (IAM previ, angina, stent, bypass)?", "opcions": [
+          { "label": "Sí, IAM o angina prèvia", "pes": 2, "flag": "N1" },
+          { "label": "Sí, stent o bypass coronari", "pes": 2, "flag": "N1" },
+          { "label": "Sí, FA o altra arítmia", "pes": 1, "flag": "N2" },
+          { "label": "No antecedents cardíacs", "pes": 0, "flag": null }
+        ]},
+        { "id": "m1", "lletra": "M", "nom": "Medicació anticoagulant", "q": "Pren anticoagulants, antiagregants o nitroglicerina?", "opcions": [
+          { "label": "Sí, anticoagulants (acenocumarol, apixaban...)", "pes": 1, "flag": null, "nota": "Rellevant per tractament" },
+          { "label": "Sí, aspirina o clopidogrel", "pes": 0, "flag": null },
+          { "label": "Sí, nitroglicerina prescrita", "pes": 1, "flag": null, "nota": "Pot administrar 1 comprimit SL si TA>90" },
+          { "label": "No medicació cardíaca", "pes": 0, "flag": null }
+        ]},
+        { "id": "fr1", "lletra": "FR", "nom": "Factors de risc", "q": "Té factors de risc cardiovascular? (HTA, diabetis, colesterol, tabac, obesitat)", "opcions": [
+          { "label": "Sí, 3 o més factors de risc", "pes": 2, "flag": "N2" },
+          { "label": "Sí, 1 o 2 factors de risc", "pes": 1, "flag": "N2" },
+          { "label": "No factors de risc coneguts", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Nàusees o vòmits associats al dolor?", "flag": "N1", "nota": "Signe vagal típic IAM" },
+        { "id": "rf2", "q": "El dolor ha aparegut per primera vegada en una persona >35 anys?", "flag": "N2", "nota": "Primer episodi en >35 anys = estudi urgent" },
+        { "id": "rf3", "q": "La persona és diabètica? (possible IAM silenciós)", "flag": "N2", "nota": "Diabètics poden tenir IAM sense dolor típic" },
+        { "id": "rf4", "q": "Embaràs o postpart recent?", "flag": "N2", "nota": "Descartar dissecció aòrtica o TEP" }
+      ]
+    },
+    "ictus": {
+      "nom": "Possible ictus / Paràlisi sobtada",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Nota asimetria facial? Demana que somrigui (FAST-F)", "si": "N1", "no": null, "alerta": "FAST positiu → CODI ICTUS" },
+        { "id": "dv2", "q": "Pot aixecar els dos braços i mantenir-los 10 seg? (FAST-A)", "si": null, "no": "N1", "alerta": "Caiguda d'un braç → CODI ICTUS" },
+        { "id": "dv3", "q": "Parla amb normalitat o hi ha afàsia/disàrtria? (FAST-S)", "si": null, "no": "N1", "alerta": "Alteració parla → CODI ICTUS" }
+      ],
+      "opqrst": [
+        { "id": "t1", "lletra": "T", "nom": "Temps — CRÍTIC", "q": "A quina hora exacta ha aparegut el primer símptoma? (o a quina hora se l'han trobat bé per última vegada)", "hint": "La finestra per trombolisi és de 4,5h. Anotar l'hora exacta és ESSENCIAL.", "opcions": [
+          { "label": "Fa menys de 4,5 hores (finestra trombolisi)", "pes": 3, "flag": "N1", "nota": "CODI ICTUS urgent: SVA directe a centre amb neurologia" },
+          { "label": "Entre 4,5 i 24 hores", "pes": 2, "flag": "N1", "nota": "Possible trombectomia mecànica fins 24h" },
+          { "label": "Al despertar (hora desconeguda)", "pes": 2, "flag": "N1", "nota": "Hora d'inici = última vegada que se'l va veure bé" },
+          { "label": "Més de 24 hores", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Els símptomes van aparèixer de forma sobtada o progressiva?", "opcions": [
+          { "label": "Sobtada, en segons o minuts (ictal)", "pes": 3, "flag": "N1", "nota": "Típic d'ictus isquèmic" },
+          { "label": "Progressiva en minuts-hores", "pes": 2, "flag": "N1", "nota": "Possible ictus hemorràgic" },
+          { "label": "Progressiva en dies", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Símptomes associats", "q": "A part de la paràlisi/parla, té cefalea, vòmits o pèrdua de consciència?", "opcions": [
+          { "label": "Sí, cefalea intensa i sobtada ('la pitjor de la vida')", "pes": 3, "flag": "N1", "nota": "Alta sospita HSA" },
+          { "label": "Sí, vòmits en escopetada", "pes": 2, "flag": "N1", "nota": "Possible ictus hemorràgic o HSA" },
+          { "label": "Sí, pèrdua de consciència associada", "pes": 2, "flag": "N1" },
+          { "label": "No, només el dèficit neurològic", "pes": 1, "flag": "N1" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Antecedents vasculars", "q": "Té antecedents d'ictus, AIT, FA o cardiopatia embolígena?", "opcions": [
+          { "label": "Sí, ictus o AIT previ", "pes": 2, "flag": "N1" },
+          { "label": "Sí, FA o vàlvula cardíaca", "pes": 2, "flag": "N1", "nota": "Risc embolisme cardíac elevat" },
+          { "label": "Sí, HTA mal controlada", "pes": 1, "flag": "N1" },
+          { "label": "No antecedents vasculars", "pes": 0, "flag": null }
+        ]},
+        { "id": "m1", "lletra": "M", "nom": "Anticoagulants", "q": "Pren anticoagulants (acenocumarol, apixaban, rivaroxaban...)?", "opcions": [
+          { "label": "Sí, anticoagulants orals", "pes": 1, "flag": null, "nota": "Contraindicació relativa trombolisi — informar neurologia" },
+          { "label": "No anticoagulants", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Pèrdua de visió en un ull o visió doble?", "flag": "N1", "nota": "Signes de circulació posterior o caròtida" },
+        { "id": "rf2", "q": "Inestabilitat o caiguda brusca sense pèrdua de consciència?", "flag": "N1", "nota": "Possible ictus de fossa posterior" },
+        { "id": "rf3", "q": "Els símptomes han cedit completament des que ha trucat?", "flag": "N2", "nota": "Possible AIT — igualment urgent: risc de recidiva en 48h" }
+      ]
+    },
+    "inconscient": {
+      "nom": "Inconscient / No respon",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Respira normalment? (observa pit durant 10 seg)", "si": null, "no": "N1", "alerta": "No respira → PCR → RCP guiada immediata" },
+        { "id": "dv2", "q": "Respon a la veu o a la pressió dolorosa?", "si": null, "no": "N1", "alerta": "Cap resposta → N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Ha caigut de cop o ha estat progressiu?", "opcions": [
+          { "label": "Caiguda sobtada (presenciada)", "pes": 3, "flag": "N1" },
+          { "label": "El troben inconscient (no presenciat)", "pes": 2, "flag": "N1" },
+          { "label": "Progressiu, anava estant cada vegada pitjor", "pes": 2, "flag": "N1" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Nivell consciència", "q": "Com respon als estímuls? (escala AVPU)", "opcions": [
+          { "label": "U — Cap resposta (Unresponsive)", "pes": 3, "flag": "N1" },
+          { "label": "P — Respon al dolor (Pain)", "pes": 3, "flag": "N1" },
+          { "label": "V — Respon a la veu però no orientat (Voice)", "pes": 2, "flag": "N1" },
+          { "label": "A — Alert però confós (Alert)", "pes": 1, "flag": "N1" }
+        ]}
+      ],
+      "ample": [
+        { "id": "m1", "lletra": "M", "nom": "Medicació / Tòxics", "q": "Ha pogut prendre medicació en excés, alcohol o drogues?", "opcions": [
+          { "label": "Sí, possible intoxicació per fàrmacs", "pes": 2, "flag": "N1", "nota": "Consulta Institut Toxicologia 91 562 04 20" },
+          { "label": "Sí, alcohol o drogues", "pes": 2, "flag": "N1" },
+          { "label": "No, sense exposició a tòxics", "pes": 0, "flag": null }
+        ]},
+        { "id": "a1", "lletra": "A", "nom": "Antecedents", "q": "Té diabetis, epilèpsia o malaltia cardíaca coneguda?", "opcions": [
+          { "label": "Diabetis — possible hipoglucèmia", "pes": 2, "flag": "N1", "nota": "Mesura glucèmia si possible" },
+          { "label": "Epilèpsia — possible crisi", "pes": 1, "flag": "N1" },
+          { "label": "Cardiopatia — possible arítmia o IAM", "pes": 2, "flag": "N1" },
+          { "label": "Cap antecedent rellevant", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Hi ha canvi de color (cianosi, pal·lidesa extrema)?", "flag": "N1", "nota": "Compromís respiratori o circulatori greu" },
+        { "id": "rf2", "q": "Ha tingut convulsions prèvies a la inconsciència?", "flag": "N1", "nota": "Status epilèptic o crisi seguida de PCR" },
+        { "id": "rf3", "q": "Hi ha signes de traumatisme craneofacial?", "flag": "N1", "nota": "TCE greu — no mobilitzar" }
+      ]
+    },
+    "desmai": {
+      "nom": "Desmai / Síncope",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Segueix inconscient ara mateix?", "si": "N1", "no": null, "alerta": "Inconscient → tractar com inconsciència N1" },
+        { "id": "dv2", "q": "Ha tingut convulsions durant la pèrdua de consciència?", "si": "N1", "no": null, "alerta": "Síncope + convulsions = N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Precipitant", "q": "Qu estava fent quan ha perdut el coneixement?", "opcions": [
+          { "label": "En repòs o esforç lleu (cardiogènic?)", "pes": 3, "flag": "N1", "nota": "Síncope en repòs = origen cardíac fins descarta" },
+          { "label": "En esforç físic intens", "pes": 2, "flag": "N1", "nota": "Síncope d'esforç — possible arítmia o MCPH" },
+          { "label": "En dret i fa calor (vasovagal probable)", "pes": 0, "flag": "N3" },
+          { "label": "Emoció forta, dolor, visió de sang", "pes": 0, "flag": "N3", "nota": "Vasovagal típic" },
+          { "label": "En incorporar-se (ortostatisme)", "pes": 1, "flag": "N3" }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Recuperació", "q": "Com s'ha recuperat? Ràpid i complet o lent i confós?", "opcions": [
+          { "label": "Ràpid i complet (<1 min), ara bé", "pes": 0, "flag": "N3", "nota": "Vasovagal probable si precipitant clar" },
+          { "label": "Lent, confusió postictal >5 min", "pes": 2, "flag": "N2", "nota": "Possible crisis convulsiva" },
+          { "label": "Parcial, es nota dèbil o marejat", "pes": 1, "flag": "N2" },
+          { "label": "No s'ha recuperat completament", "pes": 3, "flag": "N1" }
+        ]},
+        { "id": "t1", "lletra": "T", "nom": "Durada", "q": "Quant temps ha estat inconscient aproximadament?", "opcions": [
+          { "label": "Menys de 30 segons", "pes": 0, "flag": "N3" },
+          { "label": "30 segons - 2 minuts", "pes": 1, "flag": "N2" },
+          { "label": "Més de 2 minuts", "pes": 2, "flag": "N2" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Cardiopatia", "q": "Té malaltia cardíaca coneguda, arítmia o pacemaker?", "opcions": [
+          { "label": "Sí, cardiopatia o arítmia", "pes": 2, "flag": "N2", "nota": "Síncope cardiogènic fins a proves" },
+          { "label": "Sí, pacemaker o DAI", "pes": 2, "flag": "N2" },
+          { "label": "No cardiopatia coneguda", "pes": 0, "flag": null }
+        ]},
+        { "id": "fr1", "lletra": "E", "nom": "Edat i sexe", "q": "Edat del pacient?", "opcions": [
+          { "label": ">50 anys", "pes": 2, "flag": "N2", "nota": "Major risc síncope cardiogènic" },
+          { "label": "35 - 50 anys", "pes": 1, "flag": "N3" },
+          { "label": "<35 anys sense antecedents", "pes": 0, "flag": "N4" }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Ha tingut dolor al pit just abans de perdre el coneixement?", "flag": "N1", "nota": "Síncope cardiogènic — IAM o arítmia greu" },
+        { "id": "rf2", "q": "Ha tingut palpitacions just abans?", "flag": "N2", "nota": "Possible arítmia com a causa del síncope" },
+        { "id": "rf3", "q": "Té antecedent familiar de mort sobtada?", "flag": "N2", "nota": "Possible miocardiopatia hipertròfica o síndrome de Brugada" },
+        { "id": "rf4", "q": "Hi ha incontinència d'orina o femta associada?", "flag": "N2", "nota": "Possible origen convulsiu — descartar epilèpsia" }
+      ]
+    },
+    "dolor_abdominal": {
+      "nom": "Dolor abdominal",
+      "descartar_vital": [
+        { "id": "dv1", "q": "L'abdomen és rígid 'en taula' (desa la mà sobre el ventre i nota rigidesa)?", "si": "N1", "no": null, "alerta": "Abdomen en taula = peritonisme = N1 quirúrgic" },
+        { "id": "dv2", "q": "Té hipotensió o sensació de desmai associada al dolor?", "si": "N1", "no": null, "alerta": "Dolor abdominal + xoc = N1 (ruptura aneurisma?)" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Com ha aparegut el dolor?", "opcions": [
+          { "label": "Sobtà, com una 'ganivetada' (ruptura?)", "pes": 3, "flag": "N1" },
+          { "label": "Progressiu en hores (inflamatori)", "pes": 1, "flag": "N2" },
+          { "label": "Còlic (va i ve en ones)", "pes": 1, "flag": "N2", "nota": "Possible còlic biliar, renal o intestinal" },
+          { "label": "Crònic, similar a altres vegades", "pes": 0, "flag": "N4" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Qualitat", "q": "Com descriuria el dolor?", "opcions": [
+          { "label": "Molt intens, constant, no passa amb res", "pes": 2, "flag": "N1" },
+          { "label": "Còlic intens, en ones (biliar/renal)", "pes": 1, "flag": "N2" },
+          { "label": "Moderat, tolerable", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "r1", "lletra": "R", "nom": "Localització i irradiació", "q": "On és el dolor i s'escampa a algun lloc?", "opcions": [
+          { "label": "Epigastri + irradiació esquena (pancreatitis/aorta)", "pes": 2, "flag": "N1" },
+          { "label": "FID (fossa ilíaca dreta) amb defensa (apendicitis?)", "pes": 2, "flag": "N2" },
+          { "label": "Lumbar irradiat a genital (còlic renal)", "pes": 1, "flag": "N2" },
+          { "label": "Hipogastre en dona en edat fèrtil", "pes": 2, "flag": "N2", "nota": "Descartar embaràs ectòpic" },
+          { "label": "Difús, sense localització clara", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Severitat", "q": "Intensitat de 0 a 10:", "opcions": [
+          { "label": "8 - 10", "pes": 2, "flag": "N1" },
+          { "label": "5 - 7", "pes": 1, "flag": "N2" },
+          { "label": "1 - 4", "pes": 0, "flag": "N3" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Antecedents abdominals", "q": "Ha tingut cirurgies abdominals prèvies, càlculs, aneurisma o hernia?", "opcions": [
+          { "label": "Aneurisma aòrtic conegut", "pes": 3, "flag": "N1", "nota": "Dolor abdominal + aneurisma = N1 ruptura fins descarta" },
+          { "label": "Cirurgia abdominal prèvia (oclusió?)", "pes": 1, "flag": "N2" },
+          { "label": "Càlculs biliars o renals coneguts", "pes": 1, "flag": "N2" },
+          { "label": "Cap antecedent abdominal", "pes": 0, "flag": null }
+        ]},
+        { "id": "g1", "lletra": "G", "nom": "Gènere / Embaràs", "q": "Si és dona: podria estar embarassada? (data última menstruació)", "opcions": [
+          { "label": "Sí, podria estar embarassada o retard menstrual", "pes": 3, "flag": "N1", "nota": "URGENT: descartar embaràs ectòpic" },
+          { "label": "No, impossible (menopausa o anticonceptius fiables)", "pes": 0, "flag": null },
+          { "label": "És home", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Té febre >38.5°C associada?", "flag": "N2", "nota": "Procés infecciós-inflamatori (apendicitis, colecistitis, diverticulitis)" },
+        { "id": "rf2", "q": "Ha vomitat sang o té femta negra recent?", "flag": "N1", "nota": "Hemorràgia digestiva alta" },
+        { "id": "rf3", "q": "No ha fet de ventre en més de 3 dies i el ventre està distès?", "flag": "N2", "nota": "Possible oclusió intestinal" }
+      ]
+    }
+  }
+}
+;
+
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+const MOTIUS_UI = [
+  { id:'dispnea',         icon:'🫁', nom:'Dificultat per respirar' },
+  { id:'dolor_pit',       icon:'❤️',  nom:'Dolor al pit' },
+  { id:'ictus',           icon:'🧠', nom:'Possible ictus' },
+  { id:'inconscient',     icon:'😶', nom:'Inconscient / No respon' },
+  { id:'desmai',          icon:'😵', nom:'Desmai / Síncope' },
+  { id:'dolor_abdominal', icon:'🤢', nom:'Dolor abdominal' },
+  { id:'pcr',             icon:'❤️‍🔥', nom:'No respira / PCR', rcp:true }
+];
+
+const SECCIONS = [
+  { id:'descartar_vital', badge:'b-vital',  label:'Descart vital',  sub:'Preguntes d'exclusió de condició amenaçant' },
+  { id:'opqrst',          badge:'b-opqrst', label:'OPQRST',         sub:'Característiques del símptoma principal' },
+  { id:'ample',           badge:'b-ample',  label:'AMPLE',          sub:'Antecedents, medicació, events' },
+  { id:'red_flags',       badge:'b-flags',  label:'Red Flags',      sub:'Signes d'alarma específics' }
+];
+
+const NIV = {
+  N1:{ bg:'#FDECEA', border:'#C0392B', text:'#7B1010', desc:'Amenaça vital. Mobilitza recurs ara.' },
+  N2:{ bg:'#FEF0E6', border:'#D35400', text:'#7D3500', desc:'Urgent. Recurs <20 min.' },
+  N3:{ bg:'#FFF8E7', border:'#F5A800', text:'#4A3300', desc:'Urgent demorat. <60 min.' },
+  N4:{ bg:'#EAF6EE', border:'#1E8449', text:'#0f5230', desc:'Poc urgent. Derivació programada.' },
+  N5:{ bg:'#EBF5FB', border:'#1A5276', text:'#0C447C', desc:'No urgent. Consell sanitari.' }
+};
+
+// ── ESTAT ─────────────────────────────────────────────────────────────────────
+let motiuActiu = null;
+let respostes  = {};
+let nivSuggerit = null;
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+(function init(){
+  // Botons motiu
+  const grid = document.getElementById('motiuGrid');
+  MOTIUS_UI.forEach(function(m){
+    const btn = document.createElement('button');
+    btn.className = 'motiu-btn';
+    btn.dataset.id  = m.id;
+    btn.dataset.rcp = m.rcp ? '1' : '0';
+    btn.innerHTML   =
+      '<span class="motiu-icon">' + m.icon + '</span>' +
+      '<span class="motiu-nom">'  + m.nom  + '</span>';
+    grid.appendChild(btn);
+  });
+
+  // Event delegation: un sol listener per tots els botons motiu
+  grid.addEventListener('click', function(e){
+    const btn = e.target.closest('.motiu-btn');
+    if (!btn) return;
+    if (btn.dataset.rcp === '1'){ window.open('rcp.html','_blank'); return; }
+    selMotiu(btn.dataset.id);
+  });
+
+  // Confirmar nivell
+  document.getElementById('nivConfBtn').addEventListener('click', function(){
+    if (nivSuggerit) alert('Nivell ' + nivSuggerit + ' assignat.
+Recorda registrar-ho al Chronos.');
+  });
+
+  // Copiar resum
+  document.getElementById('btnCopiar').addEventListener('click', function(){
+    const txt = document.getElementById('resumBody').innerText;
+    navigator.clipboard.writeText(txt).then(function(){ alert('Resum copiat!'); });
+  });
+})();
+
+// ── SELECCIÓ MOTIU ────────────────────────────────────────────────────────────
+function selMotiu(id){
+  motiuActiu = id;
+  respostes  = {};
+  nivSuggerit = null;
+
+  document.querySelectorAll('.motiu-btn').forEach(function(b){
+    b.classList.toggle('sel', b.dataset.id === id);
+  });
+
+  resetNivBox();
+  renderAnamnesi();
+  renderProg();
+  document.getElementById('resumCard').style.display = 'none';
+}
+
+// ── RENDER ANAMNESI ───────────────────────────────────────────────────────────
+function renderAnamnesi(){
+  const motiu = ANAMNESI.motius[motiuActiu];
+  const area  = document.getElementById('anamArea');
+  if (!motiu){ area.innerHTML=''; return; }
+
+  let html = '';
+
+  SECCIONS.forEach(function(sec){
+    const data = motiu[sec.id];
+    if (!data || !data.length) return;
+
+    html += '<div class="card sec-card vis" id="sc-' + sec.id + '">';
+    html += '<div class="sec-header" data-sec="' + sec.id + '">';
+    html += '<span class="sec-badge ' + sec.badge + '">' + sec.label + '</span>';
+    html += '<div><div class="sec-title">' + sec.sub + '</div></div>';
+    html += '<span class="sec-arrow">&#9662;</span>';
+    html += '</div>';
+    html += '<div class="sec-body" id="sb-' + sec.id + '">';
+
+    if (sec.id === 'descartar_vital') html += buildDescartar(data);
+    else if (sec.id === 'opqrst')    html += buildOPQRST(data);
+    else if (sec.id === 'ample')     html += buildAMPLE(data);
+    else if (sec.id === 'red_flags') html += buildFlags(data);
+
+    html += '</div></div>';
+  });
+
+  html += '<div class="card"><div class="accions">';
+  html += '<button class="btn-p" id="btnCalc">&#9650; Calcular nivell suggerit</button>';
+  html += '<button class="btn-s" id="btnResum">&#128196; Generar resum</button>';
+  html += '<button class="btn-s" id="btnReset">&#8635; Nova trucada</button>';
+  html += '</div></div>';
+
+  area.innerHTML = html;
+
+  // Event delegation per col·lapsar seccions
+  area.addEventListener('click', function(e){
+    const hdr = e.target.closest('.sec-header');
+    if (hdr){ hdr.closest('.sec-card').classList.toggle('collapsed'); return; }
+
+    // Vital SI/NO
+    const vBtn = e.target.closest('.vital-btn');
+    if (vBtn){ onVitalBtn(vBtn); return; }
+
+    // Opcions OPQRST/AMPLE
+    const optBtn = e.target.closest('.opt-btn');
+    if (optBtn){ onOptBtn(optBtn); return; }
+
+    // Flag checkbox row
+    const flagRow = e.target.closest('.flag-row');
+    if (flagRow && e.target.tagName !== 'INPUT'){ onFlagRow(flagRow); return; }
+    const flagCb = e.target.closest('.flag-cb');
+    if (flagCb){ onFlagRow(flagCb.closest('.flag-row')); return; }
+
+    // Botons d'acció
+    if (e.target.id === 'btnCalc')   calcNivell();
+    if (e.target.id === 'btnResum')  mostrarResum();
+    if (e.target.id === 'btnReset')  resetTot();
+  });
+
+  // Checkboxes flags: evitar doble toggle
+  area.addEventListener('change', function(e){
+    if (e.target.classList.contains('flag-cb')){
+      const row = e.target.closest('.flag-row');
+      syncFlag(row);
+      calcNivell();
+      updateProg();
+    }
+  });
+}
+
+// ── BUILDERS HTML ─────────────────────────────────────────────────────────────
+function buildDescartar(data){
+  let h = '<div class="info-box i-danger" style="margin-bottom:8px">';
+  h += '&#9889; <span><strong>Respon SI/NO.</strong> Si alguna activa alarma &rarr; N1 immediatament.</span></div>';
+  data.forEach(function(p){
+    const flagSi = p.si === 'N1';
+    const flagNo = p.no === 'N1';
+    h += '<div class="vital-q">';
+    h += '<div class="vital-head"><div>';
+    h += '<div class="vital-q-text">&#128308; ' + p.q + '</div>';
+    if (p.alerta) h += '<div class="vital-alerta">&#9889; ' + p.alerta + '</div>';
+    h += '</div></div>';
+    h += '<div class="vital-opts">';
+    h += '<button class="vital-btn ' + (flagSi?'v-si-flag':'v-si') + '" data-vid="' + p.id + '" data-vresp="si" data-vflag="' + (flagSi?'1':'0') + '">&#10003; S&iacute;</button>';
+    h += '<button class="vital-btn ' + (flagNo?'v-no-flag':'v-no') + '" data-vid="' + p.id + '" data-vresp="no" data-vflag="' + (flagNo?'1':'0') + '">&#10007; No</button>';
+    h += '</div></div>';
+  });
+  return h;
+}
+
+function buildOPQRST(data){
+  let h = '';
+  data.forEach(function(p){
+    h += '<div class="preg-block">';
+    h += '<div class="preg-head">';
+    h += '<div class="preg-lletra">' + p.lletra + '</div>';
+    h += '<div><div class="preg-q">' + p.nom + ' &mdash; ' + p.q + '</div>';
+    if (p.hint) h += '<div class="preg-hint">&#8505;&#65039; ' + p.hint + '</div>';
+    h += '</div></div>';
+    h += '<div class="preg-opts">';
+    p.opcions.forEach(function(o, oi){
+      const icon = o.flag==='N1'?'&#128308;':o.flag==='N2'?'&#128992;':o.flag==='N3'?'&#128993;':'&#9898;';
+      h += '<button class="opt-btn" data-pid="' + p.id + '" data-oi="' + oi + '" data-flag="' + (o.flag||'') + '" data-pes="' + o.pes + '" data-lbl="' + encodeURIComponent(o.label) + '">';
+      h += '<span class="opt-icon">' + icon + '</span>';
+      h += '<div>' + o.label;
+      if (o.nota) h += '<span class="opt-nota">&#128172; ' + o.nota + '</span>';
+      h += '</div></button>';
+    });
+    h += '</div></div>';
+  });
+  return h;
+}
+
+function buildAMPLE(data){
+  let h = '';
+  data.forEach(function(p){
+    h += '<div class="preg-block">';
+    h += '<div class="preg-head">';
+    h += '<div class="preg-lletra preg-lletra-a">' + p.lletra + '</div>';
+    h += '<div class="preg-q">' + p.nom + ' &mdash; ' + p.q + '</div>';
+    h += '</div>';
+    h += '<div class="preg-opts">';
+    p.opcions.forEach(function(o, oi){
+      const icon = o.flag==='N1'?'&#128308;':o.flag==='N2'?'&#128992;':'&#9898;';
+      h += '<button class="opt-btn" data-pid="' + p.id + '" data-oi="' + oi + '" data-flag="' + (o.flag||'') + '" data-pes="' + o.pes + '" data-lbl="' + encodeURIComponent(o.label) + '">';
+      h += '<span class="opt-icon">' + icon + '</span>';
+      h += '<div>' + o.label;
+      if (o.nota) h += '<span class="opt-nota">&#128172; ' + o.nota + '</span>';
+      h += '</div></button>';
+    });
+    h += '</div></div>';
+  });
+  return h;
+}
+
+function buildFlags(data){
+  let h = '<div class="info-box i-warn" style="margin-bottom:8px">';
+  h += '&#9888;&#65039; <span>Marca els signes d'alarma presents. Cada positiu puja el nivell de risc.</span></div>';
+  data.forEach(function(f){
+    const pillCls = f.flag==='N1'?'p-n1':'p-n2';
+    h += '<div class="flag-row" data-fid="' + f.id + '" data-fflag="' + f.flag + '" data-fnota="' + encodeURIComponent(f.nota||'') + '">';
+    h += '<input type="checkbox" class="flag-cb" id="fcb-' + f.id + '">';
+    h += '<div class="flag-txt">' + f.q;
+    if (f.nota) h += '<span class="flag-nota-txt">&rarr; ' + f.nota + '</span>';
+    h += '</div>';
+    h += '<span class="flag-pill ' + pillCls + '">' + f.flag + '</span>';
+    h += '</div>';
+  });
+  return h;
+}
+
+// ── HANDLERS ──────────────────────────────────────────────────────────────────
+function onVitalBtn(btn){
+  const vid   = btn.dataset.vid;
+  const vresp = btn.dataset.vresp;
+  const esFlag = btn.dataset.vflag === '1';
+
+  // Marca el botó clicat, desmarca l'altre del parell
+  const pare = btn.closest('.vital-opts');
+  pare.querySelectorAll('.vital-btn').forEach(function(b){
+    b.classList.remove('actiu','actiu-ok');
+  });
+  btn.classList.add(esFlag ? 'actiu' : 'actiu-ok');
+
+  respostes[vid] = { resp:vresp, esFlag:esFlag, pes:esFlag?3:0, flag:esFlag?'N1':null, label:(vresp==='si'?'Sí':'No') };
+
+  if (esFlag) {
+    mostrarFlag('Resposta positiva a pregunta d'exclusió vital');
+    setNivBox('N1', true);
+  }
+  updateProg();
+}
+
+function onOptBtn(btn){
+  const pid  = btn.dataset.pid;
+  const flag = btn.dataset.flag || null;
+  const pes  = parseInt(btn.dataset.pes) || 0;
+  const lbl  = decodeURIComponent(btn.dataset.lbl);
+
+  // Desmarca opcions del mateix grup
+  const parent = btn.closest('.preg-opts');
+  parent.querySelectorAll('.opt-btn').forEach(function(b){
+    b.classList.remove('o-sel','o-flag');
+  });
+  btn.classList.add(flag==='N1'?'o-flag':'o-sel');
+
+  respostes[pid] = { flag:flag, pes:pes, label:lbl };
+  calcNivell();
+  updateProg();
+}
+
+function onFlagRow(row){
+  const cb    = row.querySelector('.flag-cb');
+  cb.checked  = !cb.checked;
+  syncFlag(row);
+  calcNivell();
+  updateProg();
+}
+
+function syncFlag(row){
+  const fid   = row.dataset.fid;
+  const fflag = row.dataset.fflag;
+  const nota  = decodeURIComponent(row.dataset.fnota || '');
+  const cb    = row.querySelector('.flag-cb');
+
+  if (cb.checked){
+    respostes['rf_'+fid] = { flag:fflag, pes:fflag==='N1'?3:2, label:nota };
+    mostrarFlag(nota);
+  } else {
+    delete respostes['rf_'+fid];
+  }
+}
+
+// ── CÀLCUL NIVELL ─────────────────────────────────────────────────────────────
+function calcNivell(){
+  const ORDRE = ['N1','N2','N3','N4','N5'];
+  let maxFlag = null;
+  let pesTot  = 0;
+
+  Object.values(respostes).forEach(function(r){
+    if (r.flag && r.flag !== ''){
+      if (!maxFlag || ORDRE.indexOf(r.flag) < ORDRE.indexOf(maxFlag)){
+        maxFlag = r.flag;
+      }
+    }
+    pesTot += (r.pes || 0);
+  });
+
+  let nivPes = null;
+  if      (pesTot >= 8)  nivPes = 'N1';
+  else if (pesTot >= 5)  nivPes = 'N2';
+  else if (pesTot >= 3)  nivPes = 'N3';
+  else if (pesTot >= 1)  nivPes = 'N4';
+
+  const final = maxFlag || nivPes;
+  if (final) setNivBox(final, false);
+}
+
+// ── NIVELL BOX ────────────────────────────────────────────────────────────────
+function setNivBox(codi, urgent){
+  const cfg = NIV[codi]; if (!cfg) return;
+  nivSuggerit = codi;
+  const box = document.getElementById('nivBox');
+  box.style.background  = cfg.bg;
+  box.style.borderColor = cfg.border;
+  const lbl = document.getElementById('nivLabel');
+  lbl.textContent = urgent ? '⚡ Nivell (URGENT)' : 'Nivell suggerit';
+  lbl.style.color = cfg.text;
+  const cod = document.getElementById('nivCode');
+  cod.textContent = codi; cod.style.color = cfg.text;
+  const dsc = document.getElementById('nivDesc');
+  dsc.textContent = cfg.desc; dsc.style.color = cfg.text;
+  document.getElementById('nivConfBtn').style.display = 'block';
+}
+
+function resetNivBox(){
+  nivSuggerit = null;
+  const box = document.getElementById('nivBox');
+  box.style.background  = '';
+  box.style.borderColor = '#E2E8F0';
+  document.getElementById('nivLabel').textContent = "Pendent d'anamnesi";
+  document.getElementById('nivLabel').style.color = '#718096';
+  document.getElementById('nivCode').textContent  = '—';
+  document.getElementById('nivCode').style.color  = '#718096';
+  document.getElementById('nivDesc').textContent  = 'Respon les preguntes per obtenir el suggeriment';
+  document.getElementById('nivDesc').style.color  = '#718096';
+  document.getElementById('nivConfBtn').style.display = 'none';
+}
+
+// ── FLAG ALERT ────────────────────────────────────────────────────────────────
+function mostrarFlag(msg){
+  const el = document.getElementById('flagAlert');
+  document.getElementById('flagMsg').textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.style.display='none'; }, 6000);
+}
+
+// ── PROGRÉS ───────────────────────────────────────────────────────────────────
+function renderProg(){
+  const list = document.getElementById('progList');
+  list.innerHTML = '';
+  const motiu = ANAMNESI.motius[motiuActiu];
+  if (!motiu) return;
+  SECCIONS.forEach(function(sec){
+    if (!motiu[sec.id] || !motiu[sec.id].length) return;
+    const div = document.createElement('div');
+    div.className = 'prog-item';
+    div.id = 'prog-' + sec.id;
+    div.innerHTML = '<span class="prog-dot"></span><span>' + sec.label + '</span>';
+    div.onclick = function(){ document.getElementById('sc-'+sec.id)?.scrollIntoView({behavior:'smooth'}); };
+    list.appendChild(div);
+  });
+}
+
+function updateProg(){
+  const motiu = ANAMNESI.motius[motiuActiu];
+  if (!motiu) return;
+  SECCIONS.forEach(function(sec){
+    const data = motiu[sec.id];
+    if (!data) return;
+    const total = data.length;
+    const resp  = data.filter(function(p){ return respostes[p.id] || respostes['rf_'+p.id]; }).length;
+    const el    = document.getElementById('prog-'+sec.id);
+    if (!el) return;
+    el.className = 'prog-item ' + (resp===total ? 'p-done' : resp>0 ? 'p-active' : '');
+    const lbl = resp===total ? sec.label + ' ✓' : resp>0 ? sec.label + ' (' + resp + '/' + total + ')' : sec.label;
+    el.querySelector('span:last-child').textContent = lbl;
+  });
+}
+
+// ── RESUM ─────────────────────────────────────────────────────────────────────
+function mostrarResum(){
+  const motiu = ANAMNESI.motius[motiuActiu];
+  if (!motiu) return;
+  let html = '';
+  html += '<div class="resum-item"><span class="resum-label">Motiu:</span><span class="resum-val">' + motiu.nom + '</span></div>';
+  html += '<div class="resum-item"><span class="resum-label">Nivell CDSS:</span><span class="resum-val">' + (nivSuggerit||'—') + '</span></div>';
+  Object.entries(respostes).forEach(function(entry){
+    const key = entry[0]; const r = entry[1];
+    if (r.label) html += '<div class="resum-item"><span class="resum-label" style="color:#718096">' + key + ':</span><span class="resum-val" style="font-weight:500">' + r.label + '</span></div>';
+  });
+  document.getElementById('resumBody').innerHTML = html;
+  document.getElementById('resumCard').style.display = 'block';
+  document.getElementById('resumCard').scrollIntoView({behavior:'smooth'});
+}
+
+// ── RESET ─────────────────────────────────────────────────────────────────────
+function resetTot(){
+  motiuActiu = null; respostes = {}; nivSuggerit = null;
+  document.querySelectorAll('.motiu-btn').forEach(function(b){ b.classList.remove('sel'); });
+  document.getElementById('anamArea').innerHTML =
+    '<div class="card"><div class="welcome"><div class="welcome-icon">&#127919;</div>' +
+    '<div class="welcome-title">Selecciona el motiu de consulta</div>' +
+    '<div class="welcome-text">Apareixeran les preguntes guiades organitzades per fases cl&iacute;niques.</div></div></div>';
+  document.getElementById('progList').innerHTML = '';
+  document.getElementById('resumCard').style.display = 'none';
+  resetNivBox();
+}
+</script>
+</body>
+</html>
