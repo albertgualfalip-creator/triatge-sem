@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEM · Triatge Telefònic CECOS</title>
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C0392B;--red-dk:#96281B;
+  --yel:#F5A800;--yel-dk:#C98D00;--yel-lt:#FFF8E7;--yel-br:#FAD07A;--yel-tx:#4A3300;
+  --n1-bg:#FDECEA;--n1-br:#f5c6c6;--n1-tx:#7B1010;--n1-co:#C0392B;
+  --n2-bg:#FEF0E6;--n2-br:#f8c89a;--n2-tx:#7D3500;--n2-co:#D35400;
+  --n3-bg:#FFF8E7;--n3-br:#FAD07A;--n3-tx:#4A3300;--n3-co:#F5A800;
+  --n4-bg:#EAF6EE;--n4-br:#8fdcac;--n4-tx:#0f5230;--n4-co:#1E8449;
+  --n5-bg:#EBF5FB;--n5-br:#90c8f0;--n5-tx:#0C447C;--n5-co:#1A5276;
+  --bd:#E2E8F0;--bd2:#CBD5E0;
+  --tx:#1A2530;--tx2:#4A5568;--txm:#718096;
+  --sf:#FFFFFF;--gr:#F8FAFC;--bg:#EEF2F7;
+  --fn:'Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+html,body{height:100%}
+body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;display:flex;flex-direction:column}
+
+/* HDR */
+.hdr{background:var(--red);color:#fff;position:sticky;top:0;z-index:300;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hdr-i{display:flex;align-items:center;gap:14px;padding:10px 20px;max-width:1200px;margin:0 auto}
+.hdr-logo{background:#fff;border-radius:6px;padding:4px 8px;height:40px;display:flex;align-items:center}
+.hdr-logo img{height:30px;width:auto}
+.hdr-tt{flex:1}
+.hdr-t{font-size:15px;font-weight:700}
+.hdr-s{font-size:11px;opacity:.75}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.timer{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 14px;font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.btn-nova{background:var(--yel);color:var(--yel-tx);border:none;border-radius:6px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.btn-nova:hover{background:var(--yel-dk);color:#fff}
+
+/* TABS */
+.nav-wr{background:var(--red-dk)}
+.nav-tb{max-width:1200px;margin:0 auto;display:flex;padding:0 20px}
+.tab{padding:9px 20px;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;border:none;border-bottom:3px solid transparent;background:none;font-family:var(--fn);white-space:nowrap;transition:all .15s}
+.tab:hover{color:rgba(255,255,255,.9)}
+.tab.on{color:var(--yel);border-bottom-color:var(--yel)}
+
+/* PANELS */
+.pan{display:none;flex:1;overflow-y:auto}
+.pan.vis{display:block}
+
+/* 2-COL LAYOUT */
+.l2{max-width:1200px;margin:0 auto;padding:16px;display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}
+.sb{display:flex;flex-direction:column;gap:12px;position:sticky;top:108px}
+
+/* CARDS */
+.c{background:var(--sf);border-radius:10px;border:1px solid var(--bd);overflow:hidden}
+.ch{padding:9px 14px;background:var(--gr);border-bottom:1px solid var(--bd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.cb{padding:12px 14px}
+
+/* NIV BOX */
+.nb-box{padding:12px;border-radius:8px;border:2px solid var(--bd);text-align:center;transition:all .25s}
+.nb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txm);margin-bottom:4px}
+.nb-code{font-size:26px;font-weight:900;color:var(--txm)}
+.nb-desc{font-size:11px;color:var(--txm);margin-top:3px}
+.btn-conf{width:100%;margin-top:10px;padding:9px;background:var(--yel);color:var(--yel-tx);border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fn);display:none}
+.btn-conf:hover{background:var(--yel-dk);color:#fff}
+
+/* ALARMES */
+.al-list{display:flex;flex-direction:column;gap:5px;padding:10px 12px}
+.al-item{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer}
+.al-item input{accent-color:var(--red);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.al-alert{margin:0 10px 10px;padding:8px 10px;background:var(--n1-bg);border:1px solid var(--n1-br);border-radius:6px;font-size:11px;color:var(--n1-tx);display:none}
+
+/* SEARCH */
+.sw{padding:9px 12px;border-bottom:1px solid var(--bd);position:relative}
+.sw input{width:100%;padding:7px 10px 7px 30px;border:1px solid var(--bd);border-radius:6px;font-size:13px;outline:none;font-family:var(--fn)}
+.sw input:focus{border-color:var(--yel-dk)}
+.si{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:var(--txm);font-size:13px;pointer-events:none}
+
+/* GRUP + MOTIUS */
+.gl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txm);padding:8px 14px 4px;border-bottom:.5px solid var(--bd)}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:6px;padding:10px}
+.mb{border:1px solid var(--bd);background:var(--sf);border-radius:8px;padding:9px 6px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--fn)}
+.mb:hover{border-color:var(--yel);background:var(--yel-lt)}
+.mb.sel{border-color:var(--red);background:var(--n1-bg)}
+.mb.fhq{border-color:var(--yel-br);background:var(--yel-lt)}
+.mb .mi{font-size:22px;line-height:1}
+.mb .mn{font-size:10px;font-weight:600;color:var(--tx);line-height:1.3}
+.mb.sel .mn{color:var(--red)}
+.fhq-t{font-size:8px;background:var(--yel-lt);color:var(--yel-dk);border:.5px solid var(--yel-br);border-radius:3px;padding:1px 4px;font-weight:700}
+
+/* WELCOME */
+.wc{padding:40px 20px;text-align:center;color:var(--txm)}
+.wi{font-size:48px;margin-bottom:10px}
+.wt{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:5px}
+.ws{font-size:13px;max-width:360px;margin:0 auto}
+
+/* FASE 0 */
+.f0g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px}
+.f0c{border:1px solid var(--bd);border-radius:8px;padding:10px 12px;background:var(--gr)}
+.f0q{font-size:12px;font-weight:700;margin-bottom:5px}
+.f0h{font-size:10px;color:var(--txm);margin-bottom:7px;font-style:italic}
+.f0b{width:100%;text-align:left;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--bd);background:var(--sf);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;font-family:var(--fn);margin-bottom:4px}
+.f0b:hover{background:var(--gr)}
+.f0b.sn1{background:var(--n1-bg);border-color:var(--n1-br);color:var(--n1-tx)}
+.f0b.sn2{background:var(--n2-bg);border-color:var(--n2-br);color:var(--n2-tx)}
+.f0b.sok{background:var(--n4-bg);border-color:var(--n4-br);color:var(--n4-tx)}
+.f0a{display:none;margin-top:5px;font-size:10px;padding:4px 8px;border-radius:4px;font-weight:600}
+
+/* PROTOCOL STEPS */
+.pai-box{background:var(--yel-lt);border:1px solid var(--yel-br);border-radius:6px;padding:10px 12px}
+.pai-tt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--yel-dk);margin-bottom:5px}
+.pai-tx{font-size:12px;color:var(--yel-tx);line-height:1.6}
+.rc{border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px;border:2px solid transparent;margin-bottom:8px}
+.rc.al{background:var(--n1-bg);border-color:var(--n1-co)}
+.rc.br{background:var(--n2-bg);border-color:var(--n2-co)}
+.rc.ch{background:var(--n3-bg);border-color:var(--n3-co)}
+.rc.de{background:var(--n4-bg);border-color:var(--n4-co)}
+.rc .ri{font-size:28px}
+.rc .rn{font-size:15px;font-weight:700}
+.rc .rt{font-size:11px;font-weight:700;text-transform:uppercase}
+.rc.al .rn,.rc.al .rt{color:var(--n1-co)}
+.rc.br .rn,.rc.br .rt{color:var(--n2-co)}
+.rc.ch .rn,.rc.ch .rt{color:#6A5A00}
+.rc.de .rn,.rc.de .rt{color:var(--n4-co)}
+
+/* ANAMNESI SECTIONS */
+.scc{display:none}.scc.vis{display:block}
+.sc-hd{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--gr);border-bottom:1px solid var(--bd);cursor:pointer;user-select:none}
+.sc-hd:hover{background:#EDF0F5}
+.sc-bg{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:3px 8px;border-radius:4px;flex-shrink:0}
+.bv{background:var(--n1-bg);color:var(--n1-tx);border:1px solid var(--n1-br)}
+.bo{background:var(--n5-bg);color:var(--n5-tx);border:1px solid var(--n5-br)}
+.ba{background:var(--n4-bg);color:var(--n4-tx);border:1px solid var(--n4-br)}
+.bf{background:var(--n2-bg);color:var(--n2-tx);border:1px solid var(--n2-br)}
+.sc-tt{font-size:13px;font-weight:700;flex:1}
+.sc-ar{color:var(--txm);font-size:16px;transition:transform .2s}
+.scc.co .sc-ar{transform:rotate(-90deg)}
+.scc.co .sc-bd{display:none}
+.sc-bd{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* VITAL */
+.vq{border:1px solid var(--n1-br);border-radius:8px;overflow:hidden;background:var(--n1-bg);margin-bottom:6px}
+.vqh{padding:9px 12px}
+.vqt{font-size:13px;font-weight:700;color:var(--n1-tx)}
+.vqa{font-size:10px;color:var(--red-dk);font-style:italic;margin-top:2px}
+.vo{display:flex;gap:6px;padding:4px 12px 10px}
+.vb{flex:1;padding:7px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid;cursor:pointer;font-family:var(--fn);transition:all .15s}
+.vsi{background:var(--n4-bg);border-color:var(--n4-br);color:var(--n4-tx)}
+.vno{background:var(--n4-bg);border-color:var(--n4-br);color:var(--n4-tx)}
+.vsif{background:var(--n1-bg);border-color:var(--n1-br);color:var(--n1-tx)}
+.vnof{background:var(--n1-bg);border-color:var(--n1-br);color:var(--n1-tx)}
+.vb.ak{background:var(--red);color:#fff;border-color:var(--red)}
+.vb.aok{background:var(--n4-co);color:#fff;border-color:var(--n4-co)}
+
+/* OPT */
+.pb{border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:6px}
+.ph{padding:9px 12px;background:var(--gr);border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:8px}
+.pl{width:28px;height:28px;border-radius:6px;background:var(--n5-bg);color:var(--n5-tx);font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--n5-br)}
+.pl.la{background:var(--n4-bg);color:var(--n4-tx);border-color:var(--n4-br)}
+.pq{font-size:13px;font-weight:700}
+.pi{font-size:11px;color:var(--txm);font-style:italic;margin-top:2px}
+.po{display:flex;flex-direction:column;gap:4px;padding:8px 12px}
+.ob{text-align:left;padding:8px 12px;border-radius:6px;border:1px solid var(--bd);background:var(--sf);cursor:pointer;font-size:12px;font-weight:500;font-family:var(--fn);transition:all .15s;display:flex;align-items:flex-start;gap:8px;width:100%}
+.ob:hover{border-color:var(--bd2);background:var(--gr)}
+.ob.os{border-color:var(--n5-co);background:var(--n5-bg);color:var(--n5-tx)}
+.ob.of{border-color:var(--n1-co);background:var(--n1-bg);color:var(--n1-tx)}
+.oi{font-size:14px;flex-shrink:0;margin-top:1px}
+.on{font-size:10px;color:var(--txm);font-style:italic;margin-top:3px;display:block}
+
+/* FLAGS */
+.fr{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s}
+.fr:last-child{border-bottom:none}
+.fr:hover{background:var(--yel-lt)}
+.fc{width:16px;height:16px;cursor:pointer;accent-color:var(--red);flex-shrink:0;margin-top:2px}
+.ft{font-size:12px;flex:1;line-height:1.4}
+.fn2{font-size:10px;color:var(--n2-tx);font-style:italic;display:block;margin-top:2px}
+.fp{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:2px}
+.fp1{background:var(--n1-bg);color:var(--n1-tx);border:1px solid var(--n1-br)}
+.fp2{background:var(--n2-bg);color:var(--n2-tx);border:1px solid var(--n2-br)}
+
+/* PROGRESS */
+.pl2{display:flex;flex-direction:column;gap:3px;padding:10px 12px}
+.pi2{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 6px;border-radius:5px;cursor:pointer;color:var(--txm);transition:background .1s}
+.pi2:hover{background:var(--gr)}
+.pi2.pa{background:var(--n5-bg);color:var(--n5-tx);font-weight:600}
+.pi2.pd{color:var(--n4-tx)}
+.pd2{width:8px;height:8px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.pi2.pa .pd2{background:var(--n5-co)}
+.pi2.pd .pd2{background:var(--n4-co)}
+.fsa{margin:0 10px 8px;padding:8px 10px;background:var(--n1-bg);border:1px solid var(--n1-br);border-radius:6px;font-size:11px;color:var(--n1-tx);display:none}
+
+/* INFO BOXES */
+.ib{padding:9px 12px;border-radius:6px;font-size:11px;display:flex;gap:8px;line-height:1.5}
+.id{background:var(--n1-bg);border:1px solid var(--n1-br);color:var(--n1-tx)}
+.iw{background:var(--yel-lt);border:1px solid var(--yel-br);color:var(--yel-tx)}
+.ii{background:var(--n5-bg);border:1px solid var(--n5-br);color:var(--n5-tx)}
+
+/* BADGE NIVELL */
+.nv{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;font-weight:700}
+.nv1{background:var(--n1-bg);color:var(--n1-tx);border:1px solid var(--n1-br)}
+.nv2{background:var(--n2-bg);color:var(--n2-tx);border:1px solid var(--n2-br)}
+.nv3{background:var(--n3-bg);color:var(--n3-tx);border:1px solid var(--n3-br)}
+.nv4{background:var(--n4-bg);color:var(--n4-tx);border:1px solid var(--n4-br)}
+.nv5{background:var(--n5-bg);color:var(--n5-tx);border:1px solid var(--n5-br)}
+
+/* RISKS */
+.rk{display:flex;align-items:flex-start;gap:7px;font-size:11px;cursor:pointer;padding:3px 0}
+.rk input{margin-top:2px;accent-color:var(--yel-dk);flex-shrink:0}
+
+/* BOTONS */
+.ac{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--bd);background:var(--gr)}
+.bp{background:var(--yel);color:var(--yel-tx);border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.bp:hover{background:var(--yel-dk);color:#fff}
+.bs{background:var(--sf);color:var(--tx2);border:1px solid var(--bd);border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:var(--fn)}
+.bs:hover{border-color:var(--bd2)}
+.obs{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;resize:vertical;font-family:var(--fn);min-height:70px;outline:none}
+.obs:focus{border-color:var(--yel-dk)}
+
+/* RCP */
+.rcpl{max-width:760px;margin:0 auto;padding:20px 16px;display:flex;flex-direction:column;gap:14px}
+.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.vbtn{border:1px solid var(--bd);background:var(--sf);border-radius:12px;padding:20px 10px;cursor:pointer;text-align:center;transition:all .2s;font-family:var(--fn)}
+.vbtn:hover{border-color:var(--yel);background:var(--yel-lt)}
+.vi{font-size:40px;margin-bottom:8px;line-height:1}
+.vl{font-size:15px;font-weight:700;margin-bottom:3px}
+.vs{font-size:11px;color:var(--txm)}
+.hb{background:var(--n1-bg);border:1px solid var(--n1-br);border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.hs{width:80px;height:80px}
+.hp{fill:var(--red);transform-origin:center}
+.hr{font-size:26px;font-weight:900;color:var(--red)}
+.hu{font-size:11px;color:var(--txm)}
+.bc{font-size:48px;font-weight:900;color:var(--tx);font-variant-numeric:tabular-nums;line-height:1}
+.bl{font-size:11px;color:var(--txm);text-transform:uppercase;letter-spacing:.1em}
+.brc{background:var(--gr);border:1px solid var(--bd);border-radius:10px;padding:16px;text-align:center}
+.brt{font-size:40px;font-weight:900;color:var(--yel);font-variant-numeric:tabular-nums}
+.brl{font-size:12px;color:var(--txm);margin-top:4px}
+.ar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.asi{background:var(--n4-bg);border:2px solid var(--n4-co);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:14px;font-weight:700;color:var(--n4-tx);font-family:var(--fn)}
+.asi:hover{background:var(--n4-co);color:#fff}
+.ano{background:var(--n1-bg);border:2px solid var(--n1-co);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:14px;font-weight:700;color:var(--n1-tx);font-family:var(--fn)}
+.ano:hover{background:var(--n1-co);color:#fff}
+.sl{display:flex;flex-direction:column;gap:6px}
+.si2{display:flex;align-items:flex-start;gap:10px;background:var(--gr);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;transition:all .2s}
+.si2.sa{background:var(--yel-lt);border-color:var(--yel-br)}
+.si2.sd{background:var(--n4-bg);border-color:var(--n4-br);opacity:.75}
+.sn2{width:24px;height:24px;border-radius:50%;background:var(--bd2);color:var(--txm);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si2.sa .sn2{background:var(--yel);color:var(--yel-tx)}
+.si2.sd .sn2{background:var(--n4-co);color:#fff}
+.st strong{display:block;font-size:13px;font-weight:700;margin-bottom:2px}
+.st{font-size:12px;color:var(--tx2);line-height:1.5}
+.brs{background:var(--red);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fn);flex:1}
+.brs:hover{background:var(--red-dk)}
+.bns{width:100%;background:var(--yel-lt);border:1px solid var(--yel-br);color:var(--yel-tx);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.bns:hover{background:var(--yel)}
+
+@media(max-width:768px){
+  .l2{grid-template-columns:1fr}.sb{position:static}
+  .f0g{grid-template-columns:1fr}.vg{grid-template-columns:1fr}.ar{grid-template-columns:1fr}
+}
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-i">
+    <div class="hdr-logo"><img src="data:image/png;base64,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sNehiIOHXTKQWbNO5Ybrr+fb3/4O6UyK+voGXNelurqGO++8c4fzzz33HMaPH88LL7yAlJIzzziT+a/PJ+JFEFLQ3NxMeXk5v/71r7n++ut59NHH+q694YbrefWVVygtLWVzaysVFRWsWb2a8RMm8PzzL+zQ12c+cxMLFiygpCROU1MT3V3deBGPY445liDwaWxsJBaLMXfuPI49diZz587ru9YYw6JFixk6dMjympqaD2qtf2yMOU8IcdXSpct+OnTo0J2ux3sveA8L3niDCRMmsH37dhoaRuA4DkOHDuGnP/1Z33lHHXUkF154IQ8//DA9PT3U19ejjWZkw0haWzcjBMZ13S7P89qBTsiTylmzTuWrX/kqX/zSF0mlUtTV1eE6LtU11fzmN78F4Oavf503Fr7B4MGDWbp0KR0dHdQNr2P58uUcd/xx3HffX/foxp97ztnEYnFWr1lNPB5n3rxXOO/cc/CDgCAIaGtro6amhgULXufss8/hD3/4IyCYefQx/OEPv391eF3d+40xP8OYK4Gnt7S23jN82PB+fZx99ln09vYSiUTYtnUr2Ww2dyhinz0TB6SU0ndddzsICSSFAGPg4osvYtWqlZSVldPV1UVtbS1KKaZOncr//d9t+/Xgn3D88UydNo1XX30FrRSjx4zBGEP14Gp+dccdAPz3177G8reW47ouK1euIJlMMaKhgc7OLg6Zegh33HHnfo1hf5H8y0OYTPaN9ENPVUdOnnmFcF0ixx91QeycU/GmTiJYu/75zBPPzk7d+6iL1v+J556EMYPQGnfyeGLnn46QgvScl/Dnv3kEUl6A43Srtevnptau/0PsgjOfi51/+nWJj115WvDWqtHpR54+W1SW49QPI/3InEzw1urX2y762B7z+oaGOozRCCF3ctTuLqRUrFvXclDX9UCioaEBUOzaWtD/9+bmDQd7yHuFHWZ19NFH0draSmlpgp6eXtatW48xhuHDh1FeXk5JSRwhBK+//gbTp0/rIxCJkhK2btvK+vV2AUaObCAWs+emUknWrWsGYMyYUVRUVJLNZPAiEXzfx3EcUskk29raeObJpznm+GNoaBhBLBYlk8kipSSRSNDZ2YkxGsdxcByX9evX88XP/xf/ffMtXPuxj/HiSy/S1tbG5s2tuK7D6NGjEEKiVBBO1T7qiZIEnueRSqWorqkZnEql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" alt="SEM"></div>
+    <div class="hdr-tt">
+      <div class="hdr-t">Triatge Telef&#242;nic SEM</div>
+      <div class="hdr-s">Central de Coordinaci&#243; Sanit&#224;ria &middot; CDSS Telef&#242;nic</div>
+    </div>
+    <div class="hdr-r">
+      <div class="timer" id="timerEl">00:00</div>
+      <button class="btn-nova" id="btnNova">&#9654; Nova trucada</button>
+    </div>
+  </div>
+  <div class="nav-wr">
+    <div class="nav-tb">
+      <button class="tab on" data-tab="triatge">&#128203; Triatge</button>
+      <button class="tab" data-tab="anamnesi">&#127919; Anamnesi guiada</button>
+      <button class="tab" data-tab="rcp">&#10084;&#65039; RCP guiada</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRIATGE -->
+<div class="pan vis" id="tab-triatge">
+  <div class="l2">
+    <aside class="sb">
+      <div class="c">
+        <div class="ch">&#9650; Nivell de triatge</div>
+        <div class="cb">
+          <div class="nb-box" id="tnb">
+            <div class="nb-lbl" id="tnl">Pendent</div>
+            <div class="nb-code" id="tnc">&mdash;</div>
+            <div class="nb-desc" id="tnd">Selecciona el motiu</div>
+          </div>
+          <button class="btn-conf" id="tbc">&#10003; Confirmar nivell</button>
+        </div>
+      </div>
+      <div class="c">
+        <div class="ch">&#128680; Signes d'alarma immediata</div>
+        <div class="al-list" id="alList"></div>
+        <div class="al-alert" id="alAlert">&#9889; <strong>MOBILITZACI&#211; IMMEDIATA</strong></div>
+      </div>
+      <div class="c">
+        <div class="ch">&#9888; Factors d'infra-triatge</div>
+        <div style="padding:10px;display:flex;flex-direction:column;gap:5px" id="rkList"></div>
+        <div style="padding:0 10px 8px;font-size:10px;color:var(--txm)">Davant d'algun, considera pujar el nivell un grau.</div>
+      </div>
+    </aside>
+    <main style="display:flex;flex-direction:column;gap:12px">
+      <!-- Fase 0 -->
+      <div class="c">
+        <div class="ch">&#128273; Fase 0 &mdash; Preguntes d'entrada universals
+          <span style="margin-left:auto;font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--txm)">Danish Index Start Page</span>
+        </div>
+        <div class="ib id" style="margin:10px 12px 0">&#9889; <span><strong>Regla d'or CBD:</strong> Si NO RESPIRA o &#233;s INCONSCIENT &#8594; N1 immediatament, sense esperar.</span></div>
+        <div class="f0g" id="f0Grid"></div>
+      </div>
+      <!-- Motius -->
+      <div class="c">
+        <div class="ch">&#128203; Motiu de consulta principal</div>
+        <div class="sw">
+          <span class="si">&#128269;</span>
+          <input type="text" id="searchInp" placeholder="Cerca s&#237;mptoma...">
+        </div>
+        <div id="motiuCont"></div>
+      </div>
+      <!-- Protocol -->
+      <div id="protArea">
+        <div class="c"><div class="wc"><div class="wi">&#128222;</div>
+          <div class="wt">Selecciona el motiu de consulta</div>
+          <div class="ws">Completa la Fase 0 i selecciona el s&#237;mptoma per iniciar el protocol.</div>
+        </div></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ANAMNESI -->
+<div class="pan" id="tab-anamnesi">
+  <div class="l2">
+    <aside class="sb">
+      <div class="c">
+        <div class="ch">&#9650; Nivell suggerit CDSS</div>
+        <div class="cb">
+          <div class="nb-box" id="anb">
+            <div class="nb-lbl" id="anl">Pendent d'anamnesi</div>
+            <div class="nb-code" id="anc">&mdash;</div>
+            <div class="nb-desc" id="and">Respon les preguntes per obtenir el suggeriment</div>
+          </div>
+          <button class="btn-conf" id="abc">&#10003; Confirmar nivell</button>
+          <div style="margin-top:6px;font-size:10px;color:var(--txm);text-align:center">La decisi&#243; final &#233;s de l'infermer CECOS</div>
+        </div>
+      </div>
+      <div class="fsa" id="aFlag">&#128680; <strong>Signe d'alarma:</strong> <span id="aFlagMsg"></span></div>
+      <div class="c">
+        <div class="ch">&#128203; Progr&#233;s</div>
+        <div class="pl2" id="aProg"></div>
+      </div>
+      <div class="c" id="aResCard" style="display:none">
+        <div class="ch">&#128196; Resum</div>
+        <div style="padding:10px" id="aResBody"></div>
+        <div class="ac"><button class="bp" id="aCopyBtn">&#128203; Copiar resum</button></div>
+      </div>
+    </aside>
+    <main style="display:flex;flex-direction:column;gap:12px">
+      <div class="c">
+        <div class="ch">&#128269; Selecciona el motiu per iniciar l'anamnesi guiada</div>
+        <div class="ib ii" style="margin:10px 12px 0">&#8505;&#65039; <span>Estructurat seguint <strong>ABCDE &#8594; OPQRST &#8594; AMPLE &#8594; Red Flags</strong> (model MBS suec, Holmstr&#246;m 2020). Guia cl&#237;nica, la decisi&#243; &#233;s de l'infermer.</span></div>
+        <div class="mg" id="aMotiuGrid"></div>
+      </div>
+      <div id="aAnam">
+        <div class="c"><div class="wc"><div class="wi">&#127919;</div>
+          <div class="wt">Selecciona el motiu de consulta</div>
+          <div class="ws">Apareixer&#224;n les preguntes gu&#237;ades organitzades per fases cl&#237;niques.</div>
+        </div></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- RCP -->
+<div class="pan" id="tab-rcp">
+  <div class="rcpl"><div id="rcpCont"></div></div>
+</div>
+<script>
+
+/* === DADES === */
+var PROTO = {
+  "meta": {
+    "versio": "1.0",
+    "font": "Danish Index for Emergency Care / Norwegian Index / MPDS v13 / Guies Clíniques SEM Catalunya",
+    "data": "2026-06",
+    "autors": "CECOS Reus - SEM Catalunya"
+  },
+  "nivells": {
+    "N1": { "label": "N1 — Immediat", "desc": "Amenaça vital. Mobilitza recurs ara.", "color": "#C0392B", "bg": "#FDECEA", "border": "#f5c6c6", "text": "#7B1010" },
+    "N2": { "label": "N2 — Urgent", "desc": "Situació greu no vital. Recurs <20 min.", "color": "#D35400", "bg": "#FEF0E6", "border": "#f8c89a", "text": "#7D3500" },
+    "N3": { "label": "N3 — Urgent demorat", "desc": "Requereix atenció <60 min.", "color": "#B7950B", "bg": "#FEFDE7", "border": "#f0e07a", "text": "#6B5800" },
+    "N4": { "label": "N4 — Poc urgent", "desc": "Pot esperar. Derivació programada.", "color": "#1E8449", "bg": "#EAF6EE", "border": "#8fdcac", "text": "#0f5230" },
+    "N5": { "label": "N5 — No urgent", "desc": "Consell sanitari. Sense recurs.", "color": "#1A5276", "bg": "#EBF5FB", "border": "#90c8f0", "text": "#0C447C" }
+  },
+  "fase0": {
+    "titol": "Preguntes d'entrada universals",
+    "subtitol": "Fer sempre abans de seleccionar el motiu de consulta",
+    "preguntes": [
+      {
+        "id": "resp",
+        "q": "El pacient respira?",
+        "hint": "Respiració agònica (gasping) = NO respira",
+        "respostes": [
+          { "label": "No respira / respira anormal", "nivell": "N1", "accio": "PCR — RCP guiada immediata. Mobilitza SVA + SVB.", "alarma": true },
+          { "label": "Sí, respira", "nivell": null, "accio": "Continua amb la propera pregunta." }
+        ]
+      },
+      {
+        "id": "cons",
+        "q": "El pacient respon a la veu?",
+        "hint": "Truca'l pel seu nom. Toca-li l'espatlla.",
+        "respostes": [
+          { "label": "No respon (inconscient)", "nivell": "N1", "accio": "Inconscient. Verifica respiració. Mobilitza SVA.", "alarma": true },
+          { "label": "Resposta anormal / confús / desorientat", "nivell": "N2", "accio": "Nivell mínim N2. Continua anamnesi.", "alarma": false },
+          { "label": "Alert i orientat", "nivell": null, "accio": "Continua. Selecciona el motiu de consulta." }
+        ]
+      },
+      {
+        "id": "perill",
+        "q": "Hi ha perill immediat de mort evident?",
+        "hint": "Hemorràgia massiva, atragantament, accident greu...",
+        "respostes": [
+          { "label": "Sí — perill evident", "nivell": "N1", "accio": "Mobilitza recurs. Inicia PAI específic.", "alarma": true },
+          { "label": "No — continua l'anamnesi", "nivell": null, "accio": "Selecciona el motiu de consulta principal." }
+        ]
+      }
+    ]
+  },
+  "motius": [
+    {
+      "id": "pcr",
+      "num": "01",
+      "label": "No respira / Aturada cardiorespiratòria",
+      "icon": "🫀",
+      "grup": "fhq",
+      "fhq": true,
+      "criteris": [
+        { "desc": "No respira + no respon. Respiració agònica (gasping).", "detall": "Inclou qualsevol dubte sobre si respira.", "nivell": "N1", "pai": "Inicia RCP guiada. Pregunta per DEA. Mobilitza SVA + SVB.", "ref": "Danish Idx A / Norwegian 1-3" },
+        { "desc": "Respira però inconscient + cianosi o canvi de color.", "detall": "Risc de PCR imminent.", "nivell": "N1", "pai": "Posició lateral. Via aèria lliure. SVA urgent.", "ref": "Norwegian Index 2" }
+      ]
+    },
+    {
+      "id": "inconscient",
+      "num": "02",
+      "label": "Inconscient / No respon",
+      "icon": "😶",
+      "grup": "neuro",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Inconscient + no respira o gasping.", "detall": "", "nivell": "N1", "pai": "PCR → RCP guiada immediata.", "ref": "Danish Idx A" },
+        { "desc": "Inconscient + respira + cianosi o canvi de color.", "detall": "", "nivell": "N1", "pai": "Posició lateral. SVA urgent. Control cada 30 seg.", "ref": "Norwegian Idx 2" },
+        { "desc": "Nivell consciència disminuït (AVPU=V). Confusió aguda no explicada.", "detall": "Descartar hipoglucèmia, ictus, intoxicació.", "nivell": "N1", "pai": "No deixar sol. SVA/SVB. Mesura glucèmia si possible.", "ref": "MPDS 31-D" }
+      ]
+    },
+    {
+      "id": "dispnea",
+      "num": "03",
+      "label": "Dificultat per respirar",
+      "icon": "🫁",
+      "grup": "fhq",
+      "fhq": true,
+      "criteris": [
+        { "desc": "No pot parlar per la dificultat respiratòria. Cianosi visible. Estridor o tirades marcades.", "detall": "", "nivell": "N1", "pai": "Posició semiincorporada. No res per boca. SVA urgent.", "ref": "FHQ: Respiratory failure / Danish A" },
+        { "desc": "Parla en frases curtes, s'atura per respirar. Història d'asma o MPOC descompensat.", "detall": "Saturació referida <92%.", "nivell": "N2", "pai": "Broncodilatador si prescrit. Evita esforços. SVA/SVB <20 min.", "ref": "Danish Idx B" },
+        { "desc": "Dispnea present però parla bé. Febre i tos. Sense cianosi.", "detall": "Probable infecció respiratòria.", "nivell": "N3", "pai": "Valorar derivació CAP. Observació domiciliària.", "ref": "Danish Idx B-C" },
+        { "desc": "Dificultat respiratòria lleu ocasional. Estable en repòs. Sense signes d'alarma.", "detall": "", "nivell": "N4", "pai": "Consell telefònic. Programa visita CAP/PAC.", "ref": "Danish Idx D-E" }
+      ]
+    },
+    {
+      "id": "dolor_pit",
+      "num": "04",
+      "label": "Dolor al pit",
+      "icon": "❤️",
+      "grup": "fhq",
+      "fhq": true,
+      "criteris": [
+        { "desc": "Dolor opressiu + sudoració freda + irradiació a braç/mandíbula.", "detall": "Qualsevol dolor toràcic + pèrdua de consciència o dificultat respiratòria greu.", "nivell": "N1", "pai": "Repòs absolut. Activa CODI IAM. SVA urgent. No menjar/beure.", "ref": "FHQ: Cardiac chest pain / MPDS 10-D" },
+        { "desc": "Dolor toràcic típic sense signes de gravetat. Pacient ≥35 anys o antecedents cardíacs.", "detall": "Dolor + palpitacions o malestar general.", "nivell": "N2", "pai": "Repòs absolut. No menjar/beure. SVA/SVB <20 min.", "ref": "MPDS 10-C" },
+        { "desc": "Dolor punxant o pleurític, posicional. Augmenta amb la respiració. Sense irradiació. Pacient jove sense antecedents.", "detall": "", "nivell": "N3", "pai": "Valorar origen musculoesquelètic o pleural. Derivar urgències.", "ref": "Danish Idx B-C" },
+        { "desc": "Dolor toràcic lleu en context d'ansietat. Pacient jove sense factors de risc cardiovascular.", "detall": "", "nivell": "N4", "pai": "Valorar atac de pànic. Consell tranquil·litzador. Programar visita.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "sagnat",
+      "num": "05",
+      "label": "Sagnat / Hemorràgia",
+      "icon": "🩸",
+      "grup": "trauma",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Sagnat actiu que no s'atura malgrat pressió directa. Pèrdua estimada abundant. Sagnat intern sospitat (hematemesi, melena).", "detall": "", "nivell": "N1", "pai": "Pressió directa mantinguda. Torniquet si extremitat amb sagnat arterial. SVA urgent.", "ref": "Danish Idx A" },
+        { "desc": "Ferida profunda amb sagnat moderat, controlable amb pressió. Possible lesió de tendons o vascular.", "detall": "", "nivell": "N2", "pai": "Pressió mantinguda. No retirar objecte empalat. SVB.", "ref": "Danish Idx B" },
+        { "desc": "Ferida superficial. Sagnat lleu o nasal persistent sense causa greu.", "detall": "", "nivell": "N4", "pai": "Consell de cura. Valorar visita CAP si necessita punts.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "desmai",
+      "num": "06",
+      "label": "Desmai / Síncope",
+      "icon": "😵",
+      "grup": "neuro",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Síncope no recuperat (encara inconscient quan truca).", "detall": "", "nivell": "N1", "pai": "Tractar com a inconsciència. Verifica respiració. SVA.", "ref": "Danish Idx A" },
+        { "desc": "Síncope recuperat + dolor toràcic previ, palpitacions, convulsions associades, edat >50 o cardiopatia.", "detall": "Possible síncope cardiogènic.", "nivell": "N2", "pai": "Repòs. ECG a domicili si possible. SVA/SVB.", "ref": "MPDS 31-C-2" },
+        { "desc": "Síncope recuperat complet. Pacient jove. Context de calor, deshidratació, ortostatisme o emoció.", "detall": "Síncope vasovagal probable.", "nivell": "N3", "pai": "Hidratació oral. Decúbit. Observació 1h. Valorar SVB.", "ref": "Danish Idx B-C" },
+        { "desc": "Presíncope (sensació de desmai sense pèrdua de consciència). Pacient estable i alert.", "detall": "", "nivell": "N4", "pai": "Consell higiènic-dietètic. Valorar visita CAP.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "convulsions",
+      "num": "07",
+      "label": "Convulsions",
+      "icon": "⚡",
+      "grup": "neuro",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Convulsió en curs >5 min (status epilèptic). Convulsió amb apnea o cianosi. Primer episodi convulsiu sense diagnòstic previ.", "detall": "", "nivell": "N1", "pai": "No subjectar. No posar res a la boca. Decúbit lateral. SVA urgent.", "ref": "Danish Idx A" },
+        { "desc": "Convulsió finalitzada. Pacient en fase postictal (somnolent, confós). Epilèptic conegut amb crisi típica <3 min.", "detall": "", "nivell": "N2", "pai": "Posició lateral. Vigilar nova convulsió. SVB.", "ref": "Danish Idx B" },
+        { "desc": "Convulsió febril en nen, breu, recuperat, sense cianosi.", "detall": "", "nivell": "N2", "pai": "Antipirétics si febre. No introduir res a la boca. SVB pediàtric.", "ref": "Danish Idx B" },
+        { "desc": "Epilèptic conegut, crisi típica, recuperació completa, cap signe d'alarma, no primer episodi.", "detall": "", "nivell": "N3", "pai": "Consell de seguretat. Valorar visita neurologia.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "ictus",
+      "num": "08",
+      "label": "Possible ictus / Paràlisi sobtada",
+      "icon": "🧠",
+      "grup": "fhq",
+      "fhq": true,
+      "criteris": [
+        { "desc": "FAST positiu (≥1 signe): boca torta + braç que cau + parla embolicada/absent. Inici <4,5h.", "detall": "Finestra terapèutica per trombolisi.", "nivell": "N1", "pai": "CODI ICTUS. Anotar hora exacta d'inici. No res per boca. SVA directe a centre amb neurologia.", "ref": "FHQ: Stroke / Danish Idx A" },
+        { "desc": "FAST positiu però inici >4,5h o al despertar. Símptomes que s'estan resolent (possible AIT).", "detall": "AIT pot recidivar en 24-48h.", "nivell": "N2", "pai": "Derivació urgent a neurologia. SVB.", "ref": "Danish Idx B" },
+        { "desc": "Cefalea sobtada intensa ('la pitjor de la vida') sense signes FAST. Possible HSA.", "detall": "Si s'associa a pèrdua de consciència → N1.", "nivell": "N2", "pai": "Repòs absolut. No res per boca. SVA si deteriorament.", "ref": "Danish Idx A-B" }
+      ]
+    },
+    {
+      "id": "confusio",
+      "num": "09",
+      "label": "Confusió / Desorientació aguda",
+      "icon": "🌀",
+      "grup": "neuro",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Confusió aguda d'inici sobtat en pacient prèviament orientat. Associada a febre alta, cefalea o signe neurològic focal.", "detall": "Descartar ictus, meningitis, hipoglucèmia, intoxicació.", "nivell": "N1", "pai": "SVA. No deixar sol. Mesura glucèmia si possible.", "ref": "Danish Idx A" },
+        { "desc": "Confusió progressiva en hores/dies en ancià. Possible síndrome confusional aguda (deliri).", "detall": "Causa orgànica fins a prova del contrari.", "nivell": "N2", "pai": "SVB o visita mèdica urgent domiciliària.", "ref": "Danish Idx B" }
+      ]
+    },
+    {
+      "id": "cefalea",
+      "num": "10",
+      "label": "Mal de cap intens / Cefalea sobtada",
+      "icon": "🤕",
+      "grup": "neuro",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Cefalea d'aparició brusca, 'la pitjor de la vida' (thunderclap headache). Associada a vòmit en escopetada, rigidesa de nuca o pèrdua de consciència.", "detall": "Alta sospita d'HSA.", "nivell": "N1", "pai": "SVA urgent. Repòs absolut. No res per boca.", "ref": "Danish Idx A" },
+        { "desc": "Cefalea intensa d'inici sobtat sense signes meníngies. Pacient estable i conscient.", "detall": "", "nivell": "N2", "pai": "SVA/SVB. Valorar TC urgent.", "ref": "Danish Idx B" },
+        { "desc": "Cefalea intensa en migranyós conegut, patró habitual, sense signes d'alarma.", "detall": "", "nivell": "N3", "pai": "Tractament habitual. Valorar visita urgent si no millora.", "ref": "Danish Idx C" },
+        { "desc": "Cefalea lleu o moderada, crònica, sense canvis recents.", "detall": "", "nivell": "N5", "pai": "Consell telefònic. Visita CAP programada.", "ref": "Danish Idx E" }
+      ]
+    },
+    {
+      "id": "palpitacions",
+      "num": "11",
+      "label": "Palpitacions / Ritme cardíac irregular",
+      "icon": "💓",
+      "grup": "cardio",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Palpitacions + síncope, hipotensió o dificultat respiratòria.", "detall": "Possible arítmia greu amb compromís hemodinàmic.", "nivell": "N1", "pai": "SVA urgent. Repòs absolut.", "ref": "Danish Idx A" },
+        { "desc": "Palpitacions sense síncope. Pacient amb cardiopatia coneguda o FA diagnosticada descompensada.", "detall": "", "nivell": "N2", "pai": "SVA/SVB. ECG domiciliari si possible.", "ref": "Danish Idx B" },
+        { "desc": "Palpitacions ocasionals en pacient jove sense antecedents cardíacs i hemodinàmicament estable.", "detall": "", "nivell": "N3", "pai": "Valorar Holter. Visita cardiologia.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "hta",
+      "num": "12",
+      "label": "Tensió arterial molt alta",
+      "icon": "📈",
+      "grup": "cardio",
+      "fhq": false,
+      "criteris": [
+        { "desc": "TA molt elevada + signe neurològic focal, cefalea intensa, dolor toràcic o dispnea (crisi hipertensiva amb dany diana).", "detall": "", "nivell": "N2", "pai": "SVA/SVB. Repòs absolut. No res per boca.", "ref": "Danish Idx B" },
+        { "desc": "TA molt elevada però completament asimptomàtica. Pacient orientat, sense cap molèstia.", "detall": "", "nivell": "N4", "pai": "Repòs. Pren medicació habitual si prescrita. Visita CAP avui.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "dolor_abdominal",
+      "num": "13",
+      "label": "Dolor abdominal",
+      "icon": "🤢",
+      "grup": "abdomen",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Abdomen rígid 'en taula'. Dolor intens + hipotensió o síncope. Possible ruptura d'aneurisma (ancià, dolor lumbar pulsàtil).", "detall": "Dona en edat fèrtil amb dolor i sagnat (descartar ectòpic).", "nivell": "N1", "pai": "SVA. Dieta absoluta. No analgèsics sense indicació.", "ref": "Danish Idx A" },
+        { "desc": "Dolor abdominal intens (EVA≥7), febre >38.5°C, vòmits biliosos o hematemesi. Dona en edat fèrtil sense diagnòstic.", "detall": "", "nivell": "N2", "pai": "Dieta absoluta. SVB o urgències. Possible quirúrgic.", "ref": "MPDS 1-C-3" },
+        { "desc": "Dolor abdominal moderat, tolerat, sense signes d'alarma. Possible còlic renal o gastrointestinal lleu.", "detall": "", "nivell": "N3", "pai": "Valorar analgèsia. Programar visita si persisteix.", "ref": "Danish Idx C" },
+        { "desc": "Molèstia abdominal lleu, intermitent, crònica. Sense alteració general.", "detall": "", "nivell": "N5", "pai": "Consell dietètic. Visita CAP programada.", "ref": "Danish Idx E" }
+      ]
+    },
+    {
+      "id": "vomits",
+      "num": "14",
+      "label": "Vòmits / Nàusees importants",
+      "icon": "🤮",
+      "grup": "abdomen",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Hematemesi (sang en vòmit) o vòmits fecaloideus. Vòmits + alteració de consciència.", "detall": "", "nivell": "N1", "pai": "SVA. Posició lateral si risc d'aspiració. Dieta absoluta.", "ref": "Danish Idx A" },
+        { "desc": "Vòmits repetits incapacitants, amb deshidratació clínica, en pacient d'alt risc (ancià, diabètic, embarassada).", "detall": "", "nivell": "N2", "pai": "SVB. Valorar via IV domiciliària.", "ref": "Danish Idx B" },
+        { "desc": "Vòmits ocasionals sense signes d'alarma. Pacient tolera líquids.", "detall": "", "nivell": "N4", "pai": "Dieta astringent. Metoclopramida si prescrita. Visita CAP.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "dolor_esquena",
+      "num": "15",
+      "label": "Dolor a l'esquena / Lumbalgia",
+      "icon": "🦴",
+      "grup": "abdomen",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Ancià amb dolor dorsal o lumbar pulsàtil + hipotensió. Sospita d'aneurisma aòrtic.", "detall": "", "nivell": "N1", "pai": "SVA urgent. No mobilitzar.", "ref": "Danish Idx A" },
+        { "desc": "Dolor lumbar + dificultat per caminar, retenció d'orina o anestèsia en sella (sospita de compressió medul·lar).", "detall": "", "nivell": "N2", "pai": "SVA/SVB. No mobilitzar. Repòs.", "ref": "Danish Idx B" },
+        { "desc": "Lumbàlgia aguda incapacitant, d'inici sobtat, causa mecànica probable.", "detall": "", "nivell": "N3", "pai": "Repòs. Analgèsia habitual. Valorar visita urgent.", "ref": "Danish Idx C" },
+        { "desc": "Lumbalgia crònica en exacerbació lleu. Sense signes d'alarma.", "detall": "", "nivell": "N5", "pai": "Consell de repòs i analgèsia oral. Visita CAP programada.", "ref": "Danish Idx E" }
+      ]
+    },
+    {
+      "id": "at",
+      "num": "16",
+      "label": "Accident de trànsit",
+      "icon": "🚗",
+      "grup": "trauma",
+      "fhq": true,
+      "criteris": [
+        { "desc": "AT a alta velocitat, atropellament, ejecció de vehicle, moto. Qualsevol de: inconsciència, dificultat respiratòria, sagnat massiu, deformitat greu.", "detall": "", "nivell": "N1", "pai": "SVA. No mobilitzar si sospita medul·lar. Possible activació trauma team.", "ref": "FHQ: Trauma / Danish Idx A" },
+        { "desc": "AT a baixa velocitat. Conscient i orientat. Dolor i deformitat d'extremitat sense compromís vascular ni neurològic.", "detall": "", "nivell": "N2", "pai": "Immobilitza extremitat. No res per boca. SVB <20 min.", "ref": "Danish Idx B" },
+        { "desc": "AT amb danys materials. Ocupants conscients, orientats, sense dolor significant.", "detall": "", "nivell": "N4", "pai": "Valoració presencial si refereixen molèstia. CAP.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "caiguda",
+      "num": "17",
+      "label": "Caiguda",
+      "icon": "🧎",
+      "grup": "trauma",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Caiguda amb pèrdua de consciència. Caiguda des d'alçada >3m. No pot moure extremitats o refereix anestèsia.", "detall": "", "nivell": "N1", "pai": "Immobilització columna. SVA. No mobilitzar.", "ref": "Danish Idx A" },
+        { "desc": "Caiguda de la pròpia alçada en ancià. Dolor intens al maluc o cuixa. Incapacitat per caminar.", "detall": "Fractura de maluc = emergència en ancià.", "nivell": "N2", "pai": "Immobilitza. No mobilitzar. SVB o SVA.", "ref": "Danish Idx B" },
+        { "desc": "Caiguda amb cop al cap. Conscient i orientat, sense vòmits ni PCI. Possible TCE lleu.", "detall": "", "nivell": "N3", "pai": "Vigilar 24h: cefalea creixent, vòmits, somnolència → revalorar.", "ref": "Danish Idx C" },
+        { "desc": "Caiguda sense cop al cap. Ferida superficial o contusió lleu. Pacient jove i estable.", "detall": "", "nivell": "N4", "pai": "Cura de la ferida. CAP si sospita fractura.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "ferides",
+      "num": "18",
+      "label": "Ferides / Cops / Contusions",
+      "icon": "🩹",
+      "grup": "trauma",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Ferida profunda o laceraci amb sagnat moderat controlable. Possible lesió de tendons o estructures nobles.", "detall": "", "nivell": "N2", "pai": "Pressió mantinguda. No retirar objecte empalat. SVB.", "ref": "Danish Idx B" },
+        { "desc": "Contusió sense ferida oberta. Dolor moderat. Possible fractura d'extremitat sense compromís vascular.", "detall": "", "nivell": "N3", "pai": "Immobilitza. Gel local. Valorar Rx. CAP o urgències.", "ref": "Danish Idx C" },
+        { "desc": "Ferides menors, cops lleus, sense signes d'alarma.", "detall": "", "nivell": "N4", "pai": "Neteja i cura local. CAP si necessita punts.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "cremada",
+      "num": "19",
+      "label": "Cremada",
+      "icon": "🔥",
+      "grup": "trauma",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Inhalació de fum: veu ronca, suies a la boca/nas, dificultat respiratòria. Cremada elèctrica. Cremada cara/coll/circumferencial. Extensió >20% SCT.", "detall": "", "nivell": "N1", "pai": "SVA. O2 alt flux. Risc edema laringe diferit. No descobrir la cremada.", "ref": "Danish Idx A" },
+        { "desc": "Cremada 10–20% SCT, 2n grau, sense inhalació. Zones nobles (mans, genitals, articulacions).", "detall": "", "nivell": "N2", "pai": "Refreda 15-20 min amb aigua freda. No gel ni cremes. Cobreix amb roba neta humida.", "ref": "Danish Idx B" },
+        { "desc": "Cremada <10% SCT, 1r grau (eritema) o 2n grau superficial. Zona no noble. Pacient estable.", "detall": "", "nivell": "N4", "pai": "Refreda. No destapes butllofes. Valorar CAP per cura.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "electrocucio",
+      "num": "20",
+      "label": "Electrocució / Llamp",
+      "icon": "⚡",
+      "grup": "trauma",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Qualsevol exposició a corrent elèctrica o impacte de llamp.", "detall": "Sempre N1 fins a valoració. Risc d'arítmia diferida.", "nivell": "N1", "pai": "Assegura escena (tall de corrent). SVA. Monitoratge cardíac.", "ref": "Danish Idx A" }
+      ]
+    },
+    {
+      "id": "intoxicacio",
+      "num": "21",
+      "label": "Intoxicació / Sobredosi",
+      "icon": "☠️",
+      "grup": "intox",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Alteració de consciència o convulsions post-ingesta. Inhalació de gasos tòxics o CO. Ingestió de càustics o organofosforats.", "detall": "", "nivell": "N1", "pai": "SVA. Consulta Institut Toxicologia 91 562 04 20. No provocar vòmit si càustic.", "ref": "Danish Idx A" },
+        { "desc": "Ingesta de fàrmacs o alcohol. Conscient i estable. Exposició cutània a producte químic.", "detall": "", "nivell": "N2", "pai": "Guarda l'envàs. Renta abundantment si cutani. SVB. Consulta toxicologia.", "ref": "Danish Idx B" },
+        { "desc": "Intoxicació alcohòlica lleu-moderada. Conscient, orientat, estable. Sense co-ingesta de fàrmacs.", "detall": "", "nivell": "N3", "pai": "Posició lateral preventiva. Vigilar evolució.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "gasos",
+      "num": "22",
+      "label": "Exposició a gasos / Inhalació de fum",
+      "icon": "💨",
+      "grup": "intox",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Exposició a monòxid de carboni, gasos tòxics o fum d'incendi. Qualsevol símptoma present.", "detall": "Risc de víctimes múltiples. Sempre mobilitza recurs.", "nivell": "N1", "pai": "Treure el pacient a l'exterior. Ventila l'espai. SVA. Alerta CECOS per VM.", "ref": "Danish Idx A" }
+      ]
+    },
+    {
+      "id": "allergia",
+      "num": "23",
+      "label": "Reacció al·lèrgica",
+      "icon": "⚠️",
+      "grup": "intox",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Dificultat per respirar o empassar + urticària/angioedema = anafilàxia. Hipotensió + reacció al·lèrgica.", "detall": "", "nivell": "N1", "pai": "Adrenalina IM 0.3mg si EpiPen disponible. SVA. Estirat amb cames elevades.", "ref": "Danish Idx A" },
+        { "desc": "Urticària generalitzada o angioedema sense afectació respiratòria ni hemodinàmica.", "detall": "Risc d'evolució a anafilàxia.", "nivell": "N2", "pai": "No deixar sol. SVB. Antihistamínic si prescrit.", "ref": "Danish Idx B" },
+        { "desc": "Urticària localitzada, pruïja. Sense signes sistèmics.", "detall": "", "nivell": "N4", "pai": "Antihistamínic oral. Visita CAP si persisteix.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "diabetis",
+      "num": "24",
+      "label": "Problema de sucre / Diabetis",
+      "icon": "💉",
+      "grup": "metabolic",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Hipoglucèmia amb alteració de consciència. Glucèmia <40 mg/dl. No pot deglutir.", "detall": "", "nivell": "N1", "pai": "SVA. Posició lateral. Glucagó IM si disponible. No res per boca.", "ref": "Danish Idx A" },
+        { "desc": "Hipoglucèmia simptomàtica (tremolors, sudoració, confusió lleu). Glucèmia 40-70 mg/dl. Pot deglutir.", "detall": "", "nivell": "N2", "pai": "15g glucosa ràpida (suc, sucre). Repetir glucèmia en 15 min.", "ref": "Danish Idx B" },
+        { "desc": "Hiperglucèmia sense alt. consciència. Glucèmia >350 mg/dl amb símptomes lleus.", "detall": "", "nivell": "N3", "pai": "Hidratació oral. No modificar insulina. Visita urgent CAP o urgències.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "part",
+      "num": "25",
+      "label": "Part / Embaràs amb problemes",
+      "icon": "🤱",
+      "grup": "obstetric",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Cap visible o pròleg de cordó. Contraccions cada 2-3 min. Líquid amniòtic verd o marronós. Embaràs <34 setmanes amb treball de part.", "detall": "", "nivell": "N1", "pai": "SVA + llevadora. Part imminent: guia el part per telèfon. No mobilitzar.", "ref": "Danish Idx A / MPDS P24" },
+        { "desc": "Contraccions freqüents (cada 5-10 min). Trencament d'aigües sense part imminent. Sagnat genital en embarassada.", "detall": "", "nivell": "N2", "pai": "SVA/SVB. Decúbit lateral esquerre. No res per boca.", "ref": "Danish Idx B" },
+        { "desc": "Embarassada amb dubtes o símptomes lleus sense urgència immediata.", "detall": "", "nivell": "N3", "pai": "Valorar trucada a llevadora de referència. Derivació programada.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "pediatric",
+      "num": "26",
+      "label": "Nen malalt / Urgència pediàtrica",
+      "icon": "👶",
+      "grup": "obstetric",
+      "fhq": false,
+      "criteris": [
+        { "desc": "TAP alterat en qualsevol vèrtex: hipotònic/no reactiu, estridor marcat, cianosi central. Nen <3 mesos amb qualsevol febre.", "detall": "Triangle d'Avaluació Pediàtrica: Aparença + Respiració + Circulació.", "nivell": "N1", "pai": "SVA pediàtric. No separar del familiar. Prepara material pediàtric.", "ref": "Danish Idx A" },
+        { "desc": "TAP parcialment alterat. Febre >39°C sense focus clar. Convulsió febril recuperada.", "detall": "", "nivell": "N2", "pai": "SVB pediàtric. Antipirétics si febre alta.", "ref": "Danish Idx B" },
+        { "desc": "Nen conscient, reactiu. Febre amb focus clar. TAP normal.", "detall": "", "nivell": "N3", "pai": "Consell per a febre. Valorar visita CAP pediàtrica.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "psiquiatria",
+      "num": "27",
+      "label": "Conducta estranya / Agitació / Agressivitat",
+      "icon": "🧩",
+      "grup": "psiquiatric",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Agressió activa o intent d'autòlisi amb lesió present.", "detall": "", "nivell": "N1", "pai": "Alerta Mossos d'Esquadra. SVA. No deixar sol.", "ref": "Danish Idx A" },
+        { "desc": "Agitació sense agressió activa. Psicosi activa amb perill de fugida. Conducta autolítica sense lesió.", "detall": "", "nivell": "N2", "pai": "Comunicació calm. Retira objectes perillosos. SVB. Suport CSM.", "ref": "Danish Idx B" },
+        { "desc": "Comportament desordenat però sense risc actiu. Crisi d'ansietat greu incapacitant.", "detall": "", "nivell": "N3", "pai": "Escolta activa. Mantén algú de confiança a prop. Valorar derivació urgències.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "suicidi",
+      "num": "28",
+      "label": "Ideació suïcida / Intent d'autòlisi",
+      "icon": "🆘",
+      "grup": "psiquiatric",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Intent actiu amb lesió (ingesta massiva de fàrmacs, ferida, caiguda intencionada). Perill vital imminent.", "detall": "", "nivell": "N1", "pai": "SVA. Alerta Mossos si risc de tercers. No deixar sol.", "ref": "Danish Idx A" },
+        { "desc": "Ideació suïcida amb pla concret però sense acció. Accés a mitjans letals.", "detall": "", "nivell": "N2", "pai": "No deixar sol. Retira medicació i objectes perillosos. SVB + suport CSM.", "ref": "Danish Idx B" },
+        { "desc": "Ideació suïcida sense pla concret. Pacient col·laborador.", "detall": "", "nivell": "N3", "pai": "Escolta activa. Implica xarxa de suport. Derivació urgent a CSM.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "febre",
+      "num": "29",
+      "label": "Febre / Malestar general",
+      "icon": "🌡️",
+      "grup": "general",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Febre + petèquies o taques que no desapareixen a la pressió. Febre + hipotensió + alt. consciència (sèpsia).", "detall": "Possible meningocòccia o sèpsia = emergències temps-dependents.", "nivell": "N1", "pai": "SVA. Codi sèpsia. No administrar antibiòtic sense indicació mèdica.", "ref": "Danish Idx A" },
+        { "desc": "Febre >40°C. Immunodeprimit amb febre. Nen <3 mesos. Febre + rigidesa de nuca.", "detall": "", "nivell": "N2", "pai": "SVB o visita mèdica urgent domiciliària.", "ref": "Danish Idx B" },
+        { "desc": "Febre 38-40°C, bon estat general, focus clar (catarro, otitis, IU probable).", "detall": "", "nivell": "N4", "pai": "Antipirétics. Hidratació. Visita CAP en <24h.", "ref": "Danish Idx D" },
+        { "desc": "Malestar general lleu, afebril o febre baixa, sense signes d'alarma.", "detall": "", "nivell": "N5", "pai": "Consell telefònic. Visita CAP programada.", "ref": "Danish Idx E" }
+      ]
+    },
+    {
+      "id": "ofec",
+      "num": "30",
+      "label": "Ofec / Atragantament",
+      "icon": "😮",
+      "grup": "general",
+      "fhq": false,
+      "criteris": [
+        { "desc": "No pot respirar, ni parlar, ni tossir. Obstrucció completa de la via aèria (OVACE).", "detall": "", "nivell": "N1", "pai": "OVACE guiada: maniobra Heimlich si adult conscient, 5 cops interescapulars. SVA urgent.", "ref": "Danish Idx A / MPDS P11" },
+        { "desc": "Pot parlar o tossir (obstrucció parcial). Conscient i no cianòtic.", "detall": "", "nivell": "N2", "pai": "Anima a tossir fort. No fer maniobra Heimlich si pot tossir. SVB.", "ref": "Danish Idx B" }
+      ]
+    },
+    {
+      "id": "ofegament",
+      "num": "31",
+      "label": "Ofegament / Quasi-ofegament",
+      "icon": "🌊",
+      "grup": "general",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Incident en medi aquàtic. Qualsevol grau d'alteració de consciència o dificultat respiratòria.", "detall": "Risc d'hipotèrmia i edema pulmonar diferit.", "nivell": "N1", "pai": "SVA. Posició lateral si vòmit. Manta tèrmica. No donar res per boca.", "ref": "Danish Idx A / MPDS P14" }
+      ]
+    },
+    {
+      "id": "visio",
+      "num": "32",
+      "label": "Problema als ulls / Visió",
+      "icon": "👁️",
+      "grup": "general",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Pèrdua sobtada de visió unilateral o bilateral. Associada a cefaela o signe neurològic → possible ictus.", "detall": "", "nivell": "N1", "pai": "Aplica escala FAST. Si positiu: CODI ICTUS. SVA.", "ref": "Danish Idx A" },
+        { "desc": "Exposició química ocular (àcid, base, producte de neteja).", "detall": "", "nivell": "N2", "pai": "Renta l'ull abundantment amb aigua durant 15-20 min. SVB.", "ref": "Danish Idx B" },
+        { "desc": "Dolor ocular, ull vermell, cos estrany sense afectació de la visió.", "detall": "", "nivell": "N3", "pai": "No fregar. Valorar CAP o urgències oftalmologia.", "ref": "Danish Idx C" }
+      ]
+    },
+    {
+      "id": "mossegada",
+      "num": "33",
+      "label": "Mossegada d'animal",
+      "icon": "🐕",
+      "grup": "general",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Mossegada amb sagnat important o en zona noble (cara, coll, mà). Nen mossegat.", "detall": "", "nivell": "N2", "pai": "Renta la ferida. SVB o urgències. Valorar profilaxi antiràbica.", "ref": "Danish Idx B" },
+        { "desc": "Mossegada superficial, sagnat lleu, en zona no noble.", "detall": "", "nivell": "N4", "pai": "Neteja abundant. Visita CAP per cura i valorar vacunació.", "ref": "Danish Idx D" }
+      ]
+    },
+    {
+      "id": "desconegut",
+      "num": "34",
+      "label": "Problema no especificat / Persona a terra",
+      "icon": "🔍",
+      "grup": "general",
+      "fhq": false,
+      "criteris": [
+        { "desc": "Trucant que no sap el que li passa al pacient. Persona trobada a terra sense causa aparent.", "detall": "Sempre verifica consciència i respiració com a primer pas.", "nivell": "N2", "pai": "SVB. Verifica AVPU i respiració. Reavalua constantment fins a l'arribada del recurs.", "ref": "MPDS P32 / Danish Idx B" }
+      ]
+    }
+  ]
+}
+;
+var ANAM  = {
+  "estructura": {
+    "fases": ["descartar_vital", "opqrst", "ample", "red_flags"],
+    "nota": "CDSS estructurat seguint MBS suec (ABCDE/OPQRST/AMPLE). No és un script tancat: l'infermer guia la conversa."
+  },
+  "motius": {
+    "pcr": {
+      "nom": "No respira / PCR",
+      "skip_anamnesi": true,
+      "accio_directa": "Obre mòdul RCP guiada"
+    },
+    "dispnea": {
+      "nom": "Dificultat per respirar",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Pot parlar frases senceres sense aturar-se?", "si": null, "no": "N1", "alerta": "No pot parlar → N1 immediatament" },
+        { "id": "dv2", "q": "Té els llavis o les ungles de color blau o lila (cianosi)?", "si": "N1", "no": null, "alerta": "Cianosi = N1" },
+        { "id": "dv3", "q": "Fa sorolls estranys en respirar (xiulet, estridor, gorgoteig)?", "si": "N1", "no": null, "alerta": "Sons respiratoris anormals = N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Quan ha començat la dificultat per respirar?", "hint": "Sobtada (<minuts) vs gradual (hores/dies)", "opcions": [
+          { "label": "Sobtada, fa menys d'1 hora", "pes": 2, "flag": "N1" },
+          { "label": "Gradual en hores", "pes": 1, "flag": "N2" },
+          { "label": "Dies, empitjorant progressivament", "pes": 1, "flag": "N2" },
+          { "label": "Crònica, igual que sempre", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "p1", "lletra": "P", "nom": "Provocació", "q": "Millora o empitjora amb alguna postura o activitat?", "hint": "Ortopnea (empitjora estirat) → insuficiència cardíaca", "opcions": [
+          { "label": "Empitjora estirat, millora assegut (ortopnea)", "pes": 2, "flag": "N2", "nota": "Sospita edema agut de pulmó" },
+          { "label": "Empitjora amb l'esforç", "pes": 1, "flag": "N2" },
+          { "label": "Empitjora inspirant fondo (pleurític)", "pes": 1, "flag": "N2" },
+          { "label": "No canvia amb la postura", "pes": 0, "flag": null }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Qualitat", "q": "Com descriuria la dificultat? Sensació de pes, de no poder omplir els pulmons, d'ofec...?", "hint": "", "opcions": [
+          { "label": "Sensació d'ofec intens, no pot omplir els pulmons", "pes": 2, "flag": "N1" },
+          { "label": "Opressió al pit amb la dispnea", "pes": 2, "flag": "N1", "nota": "Descartar SCA + EPA" },
+          { "label": "Xiulet en expirar (sibil·lants)", "pes": 1, "flag": "N2", "nota": "Possible asma o MPOC" },
+          { "label": "Tos seca i dificultat lleugera", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Severitat", "q": "En una escala de 0 a 10, com de greu és la dificultat per respirar ara mateix?", "hint": "0 = cap dificultat, 10 = no pot respirar gens", "opcions": [
+          { "label": "8 - 10 (molt greu, dificultats extremes)", "pes": 3, "flag": "N1" },
+          { "label": "5 - 7 (important, limita l'activitat)", "pes": 2, "flag": "N2" },
+          { "label": "3 - 4 (moderada, pot parlar)", "pes": 1, "flag": "N3" },
+          { "label": "1 - 2 (lleu, nota alguna dificultat)", "pes": 0, "flag": "N4" }
+        ]},
+        { "id": "t1", "lletra": "T", "nom": "Temps", "q": "Ha tingut episodis semblants anteriorment?", "hint": "Antecedent d'asma, MPOC, EPA previ orienta el diagnòstic", "opcions": [
+          { "label": "No, és la primera vegada", "pes": 2, "flag": "N2" },
+          { "label": "Sí, té asma o MPOC diagnosticat", "pes": 1, "flag": "N2", "nota": "Ha pres el broncodilatador?" },
+          { "label": "Sí, episodis d'insuficiència cardíaca", "pes": 2, "flag": "N2" },
+          { "label": "Sí, episodis similars però menys greus", "pes": 0, "flag": "N3" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Al·lèrgies", "q": "Té al·lèrgies conegudes? Ha pres res nou recentment?", "opcions": [
+          { "label": "Sí, al·lèrgia coneguda i possible exposició", "pes": 2, "flag": "N1", "nota": "Possible anafilàxia" },
+          { "label": "No al·lèrgies conegudes", "pes": 0, "flag": null }
+        ]},
+        { "id": "m1", "lletra": "M", "nom": "Medicació", "q": "Pren inhaladors, diürètics, betabloquejants o anticoagulants?", "opcions": [
+          { "label": "Sí, inhaladors (asma/MPOC)", "pes": 1, "flag": null, "nota": "Ha pres la medicació habitual avui?" },
+          { "label": "Sí, diürètics (insuficiència cardíaca)", "pes": 1, "flag": "N2" },
+          { "label": "Sí, betabloquejants", "pes": 1, "flag": null, "nota": "Possible broncoespasme per betabloquejants" },
+          { "label": "No medicació rellevant", "pes": 0, "flag": null }
+        ]},
+        { "id": "e1", "lletra": "E", "nom": "Esdeveniments", "q": "Ha tingut febre, tos o ha estat en contacte amb malalts els últims dies?", "opcions": [
+          { "label": "Sí, febre i tos (possible infecció resp.)", "pes": 1, "flag": "N3" },
+          { "label": "Sí, ha viatjat o immobilitzat (TEP?)", "pes": 2, "flag": "N2", "nota": "Descartar tromboembolisme pulmonar" },
+          { "label": "No, cap d'aquests", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Suoración freda associada?", "flag": "N1", "nota": "Signe vagal + dispnea = emergència" },
+        { "id": "rf2", "q": "Dolor al pit associat a la dificultat respiratòria?", "flag": "N1", "nota": "SCA + EPA = N1" },
+        { "id": "rf3", "q": "Ha tingut una caiguda o traumatisme toràcic recent?", "flag": "N1", "nota": "Possible pneumotòrax traumàtic" },
+        { "id": "rf4", "q": "La dificultat ha aparegut just després d'una punxada d'insecte, medicació o menjar?", "flag": "N1", "nota": "Anafilàxia" }
+      ]
+    },
+    "dolor_pit": {
+      "nom": "Dolor al pit",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Té sudoració freda i malestar general intens?", "si": "N1", "no": null, "alerta": "Sudoració + dolor pit = IAM fins a prova del contrari" },
+        { "id": "dv2", "q": "Perd el coneixement o es nota molt dèbil?", "si": "N1", "no": null, "alerta": "Síncope + dolor pit = N1" },
+        { "id": "dv3", "q": "Té dificultat per respirar important?", "si": "N1", "no": null, "alerta": "Dolor pit + dispnea = N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Quan ha aparegut el dolor? Estava fent alguna activitat?", "opcions": [
+          { "label": "En repòs, de cop, fa menys d'1 hora", "pes": 3, "flag": "N1" },
+          { "label": "Durant un esforç físic", "pes": 2, "flag": "N1", "nota": "Angina d'esforç o IAM" },
+          { "label": "Progressiu en hores/dies", "pes": 1, "flag": "N2" },
+          { "label": "Fa dies, intermitent", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "p1", "lletra": "P", "nom": "Provocació / Pal·liació", "q": "El dolor millora o empitjora amb alguna cosa? (postura, respiració, pressió)", "opcions": [
+          { "label": "Empitjora en inspirar fondo (pleurític)", "pes": 1, "flag": "N2", "nota": "Possible TEP, pleuritis, pericarditis" },
+          { "label": "Empitjora en moure's o palpar (musculoesquelètic)", "pes": 0, "flag": "N4" },
+          { "label": "No varia amb res (visceral)", "pes": 2, "flag": "N1", "nota": "Dolor visceral = origen cardíac probable" },
+          { "label": "Millora amb antiàcids", "pes": 0, "flag": "N3", "nota": "Possible origen digestiu" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Qualitat", "q": "Com descriuria el dolor? (opressiu, punxant, cremor, pes...)", "opcions": [
+          { "label": "Opressiu, com un pes o pressió al pit", "pes": 3, "flag": "N1", "nota": "Dolor coronari típic" },
+          { "label": "Cremor darrere l'esternó", "pes": 2, "flag": "N2", "nota": "Pot ser coronari o esofàgic" },
+          { "label": "Punxant, localitzat", "pes": 0, "flag": "N3" },
+          { "label": "Difús, difícil de localitzar", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "r1", "lletra": "R", "nom": "Radiació", "q": "El dolor s'escampa a alguna altra zona del cos?", "opcions": [
+          { "label": "Sí, al braç esquerre o als dos braços", "pes": 3, "flag": "N1", "nota": "Irradiació clàssica IAM" },
+          { "label": "Sí, a la mandíbula o el coll", "pes": 3, "flag": "N1", "nota": "Irradiació típica SCA" },
+          { "label": "Sí, a l'esquena (interescapular)", "pes": 2, "flag": "N1", "nota": "Descartar dissecció aòrtica" },
+          { "label": "No, localitzat al pit", "pes": 0, "flag": null }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Severitat", "q": "Intensitat del dolor de 0 a 10:", "opcions": [
+          { "label": "8 - 10 (insuportable)", "pes": 3, "flag": "N1" },
+          { "label": "5 - 7 (intens, molt molest)", "pes": 2, "flag": "N2" },
+          { "label": "3 - 4 (moderat, tolerable)", "pes": 1, "flag": "N3" },
+          { "label": "1 - 2 (lleu)", "pes": 0, "flag": "N4" }
+        ]},
+        { "id": "t1", "lletra": "T", "nom": "Temps", "q": "Fa quant temps que dura el dolor sense cedir?", "opcions": [
+          { "label": "Menys de 30 minuts", "pes": 3, "flag": "N1", "nota": "Finestra terapèutica IAM" },
+          { "label": "30 minuts - 6 hores", "pes": 2, "flag": "N1" },
+          { "label": "6 - 24 hores", "pes": 1, "flag": "N2" },
+          { "label": "Més de 24 hores, intermitent", "pes": 0, "flag": "N3" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Antecedents cardíacs", "q": "Té historial de malaltia cardíaca (IAM previ, angina, stent, bypass)?", "opcions": [
+          { "label": "Sí, IAM o angina prèvia", "pes": 2, "flag": "N1" },
+          { "label": "Sí, stent o bypass coronari", "pes": 2, "flag": "N1" },
+          { "label": "Sí, FA o altra arítmia", "pes": 1, "flag": "N2" },
+          { "label": "No antecedents cardíacs", "pes": 0, "flag": null }
+        ]},
+        { "id": "m1", "lletra": "M", "nom": "Medicació anticoagulant", "q": "Pren anticoagulants, antiagregants o nitroglicerina?", "opcions": [
+          { "label": "Sí, anticoagulants (acenocumarol, apixaban...)", "pes": 1, "flag": null, "nota": "Rellevant per tractament" },
+          { "label": "Sí, aspirina o clopidogrel", "pes": 0, "flag": null },
+          { "label": "Sí, nitroglicerina prescrita", "pes": 1, "flag": null, "nota": "Pot administrar 1 comprimit SL si TA>90" },
+          { "label": "No medicació cardíaca", "pes": 0, "flag": null }
+        ]},
+        { "id": "fr1", "lletra": "FR", "nom": "Factors de risc", "q": "Té factors de risc cardiovascular? (HTA, diabetis, colesterol, tabac, obesitat)", "opcions": [
+          { "label": "Sí, 3 o més factors de risc", "pes": 2, "flag": "N2" },
+          { "label": "Sí, 1 o 2 factors de risc", "pes": 1, "flag": "N2" },
+          { "label": "No factors de risc coneguts", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Nàusees o vòmits associats al dolor?", "flag": "N1", "nota": "Signe vagal típic IAM" },
+        { "id": "rf2", "q": "El dolor ha aparegut per primera vegada en una persona >35 anys?", "flag": "N2", "nota": "Primer episodi en >35 anys = estudi urgent" },
+        { "id": "rf3", "q": "La persona és diabètica? (possible IAM silenciós)", "flag": "N2", "nota": "Diabètics poden tenir IAM sense dolor típic" },
+        { "id": "rf4", "q": "Embaràs o postpart recent?", "flag": "N2", "nota": "Descartar dissecció aòrtica o TEP" }
+      ]
+    },
+    "ictus": {
+      "nom": "Possible ictus / Paràlisi sobtada",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Nota asimetria facial? Demana que somrigui (FAST-F)", "si": "N1", "no": null, "alerta": "FAST positiu → CODI ICTUS" },
+        { "id": "dv2", "q": "Pot aixecar els dos braços i mantenir-los 10 seg? (FAST-A)", "si": null, "no": "N1", "alerta": "Caiguda d'un braç → CODI ICTUS" },
+        { "id": "dv3", "q": "Parla amb normalitat o hi ha afàsia/disàrtria? (FAST-S)", "si": null, "no": "N1", "alerta": "Alteració parla → CODI ICTUS" }
+      ],
+      "opqrst": [
+        { "id": "t1", "lletra": "T", "nom": "Temps — CRÍTIC", "q": "A quina hora exacta ha aparegut el primer símptoma? (o a quina hora se l'han trobat bé per última vegada)", "hint": "La finestra per trombolisi és de 4,5h. Anotar l'hora exacta és ESSENCIAL.", "opcions": [
+          { "label": "Fa menys de 4,5 hores (finestra trombolisi)", "pes": 3, "flag": "N1", "nota": "CODI ICTUS urgent: SVA directe a centre amb neurologia" },
+          { "label": "Entre 4,5 i 24 hores", "pes": 2, "flag": "N1", "nota": "Possible trombectomia mecànica fins 24h" },
+          { "label": "Al despertar (hora desconeguda)", "pes": 2, "flag": "N1", "nota": "Hora d'inici = última vegada que se'l va veure bé" },
+          { "label": "Més de 24 hores", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Els símptomes van aparèixer de forma sobtada o progressiva?", "opcions": [
+          { "label": "Sobtada, en segons o minuts (ictal)", "pes": 3, "flag": "N1", "nota": "Típic d'ictus isquèmic" },
+          { "label": "Progressiva en minuts-hores", "pes": 2, "flag": "N1", "nota": "Possible ictus hemorràgic" },
+          { "label": "Progressiva en dies", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Símptomes associats", "q": "A part de la paràlisi/parla, té cefalea, vòmits o pèrdua de consciència?", "opcions": [
+          { "label": "Sí, cefalea intensa i sobtada ('la pitjor de la vida')", "pes": 3, "flag": "N1", "nota": "Alta sospita HSA" },
+          { "label": "Sí, vòmits en escopetada", "pes": 2, "flag": "N1", "nota": "Possible ictus hemorràgic o HSA" },
+          { "label": "Sí, pèrdua de consciència associada", "pes": 2, "flag": "N1" },
+          { "label": "No, només el dèficit neurològic", "pes": 1, "flag": "N1" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Antecedents vasculars", "q": "Té antecedents d'ictus, AIT, FA o cardiopatia embolígena?", "opcions": [
+          { "label": "Sí, ictus o AIT previ", "pes": 2, "flag": "N1" },
+          { "label": "Sí, FA o vàlvula cardíaca", "pes": 2, "flag": "N1", "nota": "Risc embolisme cardíac elevat" },
+          { "label": "Sí, HTA mal controlada", "pes": 1, "flag": "N1" },
+          { "label": "No antecedents vasculars", "pes": 0, "flag": null }
+        ]},
+        { "id": "m1", "lletra": "M", "nom": "Anticoagulants", "q": "Pren anticoagulants (acenocumarol, apixaban, rivaroxaban...)?", "opcions": [
+          { "label": "Sí, anticoagulants orals", "pes": 1, "flag": null, "nota": "Contraindicació relativa trombolisi — informar neurologia" },
+          { "label": "No anticoagulants", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Pèrdua de visió en un ull o visió doble?", "flag": "N1", "nota": "Signes de circulació posterior o caròtida" },
+        { "id": "rf2", "q": "Inestabilitat o caiguda brusca sense pèrdua de consciència?", "flag": "N1", "nota": "Possible ictus de fossa posterior" },
+        { "id": "rf3", "q": "Els símptomes han cedit completament des que ha trucat?", "flag": "N2", "nota": "Possible AIT — igualment urgent: risc de recidiva en 48h" }
+      ]
+    },
+    "inconscient": {
+      "nom": "Inconscient / No respon",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Respira normalment? (observa pit durant 10 seg)", "si": null, "no": "N1", "alerta": "No respira → PCR → RCP guiada immediata" },
+        { "id": "dv2", "q": "Respon a la veu o a la pressió dolorosa?", "si": null, "no": "N1", "alerta": "Cap resposta → N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Ha caigut de cop o ha estat progressiu?", "opcions": [
+          { "label": "Caiguda sobtada (presenciada)", "pes": 3, "flag": "N1" },
+          { "label": "El troben inconscient (no presenciat)", "pes": 2, "flag": "N1" },
+          { "label": "Progressiu, anava estant cada vegada pitjor", "pes": 2, "flag": "N1" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Nivell consciència", "q": "Com respon als estímuls? (escala AVPU)", "opcions": [
+          { "label": "U — Cap resposta (Unresponsive)", "pes": 3, "flag": "N1" },
+          { "label": "P — Respon al dolor (Pain)", "pes": 3, "flag": "N1" },
+          { "label": "V — Respon a la veu però no orientat (Voice)", "pes": 2, "flag": "N1" },
+          { "label": "A — Alert però confós (Alert)", "pes": 1, "flag": "N1" }
+        ]}
+      ],
+      "ample": [
+        { "id": "m1", "lletra": "M", "nom": "Medicació / Tòxics", "q": "Ha pogut prendre medicació en excés, alcohol o drogues?", "opcions": [
+          { "label": "Sí, possible intoxicació per fàrmacs", "pes": 2, "flag": "N1", "nota": "Consulta Institut Toxicologia 91 562 04 20" },
+          { "label": "Sí, alcohol o drogues", "pes": 2, "flag": "N1" },
+          { "label": "No, sense exposició a tòxics", "pes": 0, "flag": null }
+        ]},
+        { "id": "a1", "lletra": "A", "nom": "Antecedents", "q": "Té diabetis, epilèpsia o malaltia cardíaca coneguda?", "opcions": [
+          { "label": "Diabetis — possible hipoglucèmia", "pes": 2, "flag": "N1", "nota": "Mesura glucèmia si possible" },
+          { "label": "Epilèpsia — possible crisi", "pes": 1, "flag": "N1" },
+          { "label": "Cardiopatia — possible arítmia o IAM", "pes": 2, "flag": "N1" },
+          { "label": "Cap antecedent rellevant", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Hi ha canvi de color (cianosi, pal·lidesa extrema)?", "flag": "N1", "nota": "Compromís respiratori o circulatori greu" },
+        { "id": "rf2", "q": "Ha tingut convulsions prèvies a la inconsciència?", "flag": "N1", "nota": "Status epilèptic o crisi seguida de PCR" },
+        { "id": "rf3", "q": "Hi ha signes de traumatisme craneofacial?", "flag": "N1", "nota": "TCE greu — no mobilitzar" }
+      ]
+    },
+    "desmai": {
+      "nom": "Desmai / Síncope",
+      "descartar_vital": [
+        { "id": "dv1", "q": "Segueix inconscient ara mateix?", "si": "N1", "no": null, "alerta": "Inconscient → tractar com inconsciència N1" },
+        { "id": "dv2", "q": "Ha tingut convulsions durant la pèrdua de consciència?", "si": "N1", "no": null, "alerta": "Síncope + convulsions = N1" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Precipitant", "q": "Qu estava fent quan ha perdut el coneixement?", "opcions": [
+          { "label": "En repòs o esforç lleu (cardiogènic?)", "pes": 3, "flag": "N1", "nota": "Síncope en repòs = origen cardíac fins descarta" },
+          { "label": "En esforç físic intens", "pes": 2, "flag": "N1", "nota": "Síncope d'esforç — possible arítmia o MCPH" },
+          { "label": "En dret i fa calor (vasovagal probable)", "pes": 0, "flag": "N3" },
+          { "label": "Emoció forta, dolor, visió de sang", "pes": 0, "flag": "N3", "nota": "Vasovagal típic" },
+          { "label": "En incorporar-se (ortostatisme)", "pes": 1, "flag": "N3" }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Recuperació", "q": "Com s'ha recuperat? Ràpid i complet o lent i confós?", "opcions": [
+          { "label": "Ràpid i complet (<1 min), ara bé", "pes": 0, "flag": "N3", "nota": "Vasovagal probable si precipitant clar" },
+          { "label": "Lent, confusió postictal >5 min", "pes": 2, "flag": "N2", "nota": "Possible crisis convulsiva" },
+          { "label": "Parcial, es nota dèbil o marejat", "pes": 1, "flag": "N2" },
+          { "label": "No s'ha recuperat completament", "pes": 3, "flag": "N1" }
+        ]},
+        { "id": "t1", "lletra": "T", "nom": "Durada", "q": "Quant temps ha estat inconscient aproximadament?", "opcions": [
+          { "label": "Menys de 30 segons", "pes": 0, "flag": "N3" },
+          { "label": "30 segons - 2 minuts", "pes": 1, "flag": "N2" },
+          { "label": "Més de 2 minuts", "pes": 2, "flag": "N2" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Cardiopatia", "q": "Té malaltia cardíaca coneguda, arítmia o pacemaker?", "opcions": [
+          { "label": "Sí, cardiopatia o arítmia", "pes": 2, "flag": "N2", "nota": "Síncope cardiogènic fins a proves" },
+          { "label": "Sí, pacemaker o DAI", "pes": 2, "flag": "N2" },
+          { "label": "No cardiopatia coneguda", "pes": 0, "flag": null }
+        ]},
+        { "id": "fr1", "lletra": "E", "nom": "Edat i sexe", "q": "Edat del pacient?", "opcions": [
+          { "label": ">50 anys", "pes": 2, "flag": "N2", "nota": "Major risc síncope cardiogènic" },
+          { "label": "35 - 50 anys", "pes": 1, "flag": "N3" },
+          { "label": "<35 anys sense antecedents", "pes": 0, "flag": "N4" }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Ha tingut dolor al pit just abans de perdre el coneixement?", "flag": "N1", "nota": "Síncope cardiogènic — IAM o arítmia greu" },
+        { "id": "rf2", "q": "Ha tingut palpitacions just abans?", "flag": "N2", "nota": "Possible arítmia com a causa del síncope" },
+        { "id": "rf3", "q": "Té antecedent familiar de mort sobtada?", "flag": "N2", "nota": "Possible miocardiopatia hipertròfica o síndrome de Brugada" },
+        { "id": "rf4", "q": "Hi ha incontinència d'orina o femta associada?", "flag": "N2", "nota": "Possible origen convulsiu — descartar epilèpsia" }
+      ]
+    },
+    "dolor_abdominal": {
+      "nom": "Dolor abdominal",
+      "descartar_vital": [
+        { "id": "dv1", "q": "L'abdomen és rígid 'en taula' (desa la mà sobre el ventre i nota rigidesa)?", "si": "N1", "no": null, "alerta": "Abdomen en taula = peritonisme = N1 quirúrgic" },
+        { "id": "dv2", "q": "Té hipotensió o sensació de desmai associada al dolor?", "si": "N1", "no": null, "alerta": "Dolor abdominal + xoc = N1 (ruptura aneurisma?)" }
+      ],
+      "opqrst": [
+        { "id": "o1", "lletra": "O", "nom": "Onset", "q": "Com ha aparegut el dolor?", "opcions": [
+          { "label": "Sobtà, com una 'ganivetada' (ruptura?)", "pes": 3, "flag": "N1" },
+          { "label": "Progressiu en hores (inflamatori)", "pes": 1, "flag": "N2" },
+          { "label": "Còlic (va i ve en ones)", "pes": 1, "flag": "N2", "nota": "Possible còlic biliar, renal o intestinal" },
+          { "label": "Crònic, similar a altres vegades", "pes": 0, "flag": "N4" }
+        ]},
+        { "id": "q1", "lletra": "Q", "nom": "Qualitat", "q": "Com descriuria el dolor?", "opcions": [
+          { "label": "Molt intens, constant, no passa amb res", "pes": 2, "flag": "N1" },
+          { "label": "Còlic intens, en ones (biliar/renal)", "pes": 1, "flag": "N2" },
+          { "label": "Moderat, tolerable", "pes": 0, "flag": "N3" }
+        ]},
+        { "id": "r1", "lletra": "R", "nom": "Localització i irradiació", "q": "On és el dolor i s'escampa a algun lloc?", "opcions": [
+          { "label": "Epigastri + irradiació esquena (pancreatitis/aorta)", "pes": 2, "flag": "N1" },
+          { "label": "FID (fossa ilíaca dreta) amb defensa (apendicitis?)", "pes": 2, "flag": "N2" },
+          { "label": "Lumbar irradiat a genital (còlic renal)", "pes": 1, "flag": "N2" },
+          { "label": "Hipogastre en dona en edat fèrtil", "pes": 2, "flag": "N2", "nota": "Descartar embaràs ectòpic" },
+          { "label": "Difús, sense localització clara", "pes": 1, "flag": "N2" }
+        ]},
+        { "id": "s1", "lletra": "S", "nom": "Severitat", "q": "Intensitat de 0 a 10:", "opcions": [
+          { "label": "8 - 10", "pes": 2, "flag": "N1" },
+          { "label": "5 - 7", "pes": 1, "flag": "N2" },
+          { "label": "1 - 4", "pes": 0, "flag": "N3" }
+        ]}
+      ],
+      "ample": [
+        { "id": "a1", "lletra": "A", "nom": "Antecedents abdominals", "q": "Ha tingut cirurgies abdominals prèvies, càlculs, aneurisma o hernia?", "opcions": [
+          { "label": "Aneurisma aòrtic conegut", "pes": 3, "flag": "N1", "nota": "Dolor abdominal + aneurisma = N1 ruptura fins descarta" },
+          { "label": "Cirurgia abdominal prèvia (oclusió?)", "pes": 1, "flag": "N2" },
+          { "label": "Càlculs biliars o renals coneguts", "pes": 1, "flag": "N2" },
+          { "label": "Cap antecedent abdominal", "pes": 0, "flag": null }
+        ]},
+        { "id": "g1", "lletra": "G", "nom": "Gènere / Embaràs", "q": "Si és dona: podria estar embarassada? (data última menstruació)", "opcions": [
+          { "label": "Sí, podria estar embarassada o retard menstrual", "pes": 3, "flag": "N1", "nota": "URGENT: descartar embaràs ectòpic" },
+          { "label": "No, impossible (menopausa o anticonceptius fiables)", "pes": 0, "flag": null },
+          { "label": "És home", "pes": 0, "flag": null }
+        ]}
+      ],
+      "red_flags": [
+        { "id": "rf1", "q": "Té febre >38.5°C associada?", "flag": "N2", "nota": "Procés infecciós-inflamatori (apendicitis, colecistitis, diverticulitis)" },
+        { "id": "rf2", "q": "Ha vomitat sang o té femta negra recent?", "flag": "N1", "nota": "Hemorràgia digestiva alta" },
+        { "id": "rf3", "q": "No ha fet de ventre en més de 3 dies i el ventre està distès?", "flag": "N2", "nota": "Possible oclusió intestinal" }
+      ]
+    }
+  }
+}
+;
+
+/* === CONFIG === */
+var NV = {
+  N1:{bg:'var(--n1-bg)',bc:'var(--n1-co)',tc:'var(--n1-tx)',lb:'N1 \u2014 Immediat',dc:'Amen\u00e7a vital. Mobilitza recurs ara.',cl:'nv1'},
+  N2:{bg:'var(--n2-bg)',bc:'var(--n2-co)',tc:'var(--n2-tx)',lb:'N2 \u2014 Urgent',dc:'Urgent. Recurs <20 min.',cl:'nv2'},
+  N3:{bg:'var(--n3-bg)',bc:'var(--n3-co)',tc:'var(--n3-tx)',lb:'N3 \u2014 Urgent demorat',dc:'Urgent demorat. <60 min.',cl:'nv3'},
+  N4:{bg:'var(--n4-bg)',bc:'var(--n4-co)',tc:'var(--n4-tx)',lb:'N4 \u2014 Poc urgent',dc:'Poc urgent. Derivaci\u00f3 programada.',cl:'nv4'},
+  N5:{bg:'var(--n5-bg)',bc:'var(--n5-co)',tc:'var(--n5-tx)',lb:'N5 \u2014 No urgent',dc:'No urgent. Consell sanit\u00e0ri.',cl:'nv5'}
+};
+
+var NMAP  = {ALPHA:'N1',BRAVO:'N2',CHARLIE:'N3',DELTA:'N4',OMEGA:'N5'};
+var RCLS  = {ALPHA:'al',BRAVO:'br',CHARLIE:'ch',DELTA:'de'};
+
+var GRUPS = {
+  fhq:'\ud83d\udd34 First Hour Quintet',
+  neuro:'\ud83e\udde0 Neurol\u00f2gic / Consci\u00e8ncia',
+  cardio:'\ud83d\udc93 Cardiovascular',
+  abdomen:'\ud83e\udd22 Abdominal / Digestiu',
+  trauma:'\ud83e\ude79 Traumatismes / Accidents',
+  intox:'\u2697\ufe0f Intoxicaci\u00f3 / Al\u00b7l\u00e8rgia',
+  metabolic:'\ud83d\udc89 Metab\u00f2lic',
+  obstetric:'\ud83e\udd31 Obst\u00e8tric / Pedi\u00e0tric',
+  psiquiatric:'\ud83e\udde9 Psiqui\u00e0tric',
+  general:'\ud83d\udccb Altres s\u00edmptomes'
+};
+
+var ALARMES = [
+  'No respira / respira anormal (gasping)',
+  'Inconscient / no respon',
+  'Hemorr\u00e0gia massiva incontrolable',
+  'Dificultat respirat\u00f2ria greu (no pot parlar)',
+  'Cianosi / canvi de color evident',
+  'Possible ictus (FAST positiu)'
+];
+var RISKS = [
+  {lb:'Edat \u226565 anys',ht:'OR 1.49\u20132.18 infra-triatge (Andersen 2020).'},
+  {lb:'Trucant en 3a persona',ht:'Informaci\u00f3 incompleta o minimitzada.'},
+  {lb:'Taqui\u00e0rdia / bradic\u00e0rdia referida',ht:'OR 2.17\u20132.54 infra-triatge.'},
+  {lb:'Hip\u00f2xia o mala coloraci\u00f3 referida',ht:'OR 2.19. Pregunta per la saturaci\u00f3.'},
+  {lb:'Dona f\u00e8rtil + dolor abdominal',ht:'Risc embaras ect\u00f2pic (MPDS 1-C-3).'}
+];
+var MOTIUS_A = [
+  {id:'dispnea',ic:'\ud83e\ub941',nm:'Dificultat per respirar'},
+  {id:'dolor_pit',ic:'\u2764\ufe0f',nm:'Dolor al pit'},
+  {id:'ictus',ic:'\ud83e\udde0',nm:'Possible ictus'},
+  {id:'inconscient',ic:'\ud83d\ude36',nm:'Inconscient / No respon'},
+  {id:'desmai',ic:'\ud83d\ude35',nm:'Desmai / S\u00edncope'},
+  {id:'dolor_abdominal',ic:'\ud83e\udd22',nm:'Dolor abdominal'},
+  {id:'pcr',ic:'\u2764\ufe0f\u200d\ud83d\udd25',nm:'No respira / PCR \u2192 RCP',rcp:true}
+];
+var SECS = [
+  {id:'descartar_vital',bg:'bv',lb:'Descart vital',sb:"Preguntes d'exclusi\u00f3"},
+  {id:'opqrst',bg:'bo',lb:'OPQRST',sb:'Caracter\u00edstiques del s\u00edmptoma'},
+  {id:'ample',bg:'ba',lb:'AMPLE',sb:'Antecedents, medicaci\u00f3, events'},
+  {id:'red_flags',bg:'bf',lb:'Red Flags',sb:"Signes d'alarma espec\u00edfics"}
+];
+var RCP_STEPS = {
+  adult:[
+    {t:'Crida ajuda i mans lliures',b:"Crida fort: 'Necessito ajuda!' Posa el tel\u00e8fon en mans lliures."},
+    {t:'Estirar el pacient a terra',b:'Boca amunt, superf\u00edcie dura i plana. Zona segura.'},
+    {t:'Agenollar-se al costat',b:'Al costat del pit. Genolls separats per estabilitat.'},
+    {t:'Posici\u00f3 de les mans',b:"Tal\u00f3 d'una m\u00e0 al centre del pit (meitat inferior de l'estern\u00f3). Altra m\u00e0 a sobre, dits entrellaats. Bra\u00e7os rectes."},
+    {t:'Inicia compressions',b:'Fort i r\u00e0pid: 5\u20136 cm, 100\u2013120/min. Deixa el pit recuperar entre compressions.'}
+  ],
+  child:[
+    {t:'Crida ajuda i mans lliures',b:'Crida fort i activa mans lliures ara.'},
+    {t:'Estirar el nen a terra',b:'Boca amunt, superf\u00edcie dura.'},
+    {t:'Agenollar-se al costat',b:'Posici\u00f3 estable al costat del nen.'},
+    {t:"Posici\u00f3 d'una m\u00e0",b:"Tal\u00f3 d'UNA m\u00e0 al centre del pit. Dues mans si el nen \u00e9s gran."},
+    {t:'Inicia compressions',b:'4\u20135 cm de profunditat, 100\u2013120/min.'}
+  ],
+  infant:[
+    {t:'Crida ajuda i mans lliures',b:'Crida fort i activa mans lliures ara.'},
+    {t:'Estirar el lactant a terra',b:'Boca amunt, superf\u00edcie dura. Cap en posici\u00f3 neutra.'},
+    {t:'Posici\u00f3',b:'Agenollat al costat del lactant.'},
+    {t:'2 dits al centre',b:'Index i mig just per sota la l\u00ednia dels mugrons.'},
+    {t:'Inicia compressions',b:'4 cm (1/3 del pit), 100\u2013120/min.'}
+  ]
+};
+
+/* === ESTAT === */
+var tmr = 0, tmrInt = null;
+var tMot = null, tNiv = null;
+var aMot = null, aRes = {}, aNiv = null;
+var rVic = null, rRun = false, rBeat = 0, rStep = 0, rChk = false, rChkSec = 10;
+var rHrtInt = null, rChkInt = null;
+
+/* === UTILS === */
+function el(id){ return document.getElementById(id); }
+function wHtml(ic,ti,tx){
+  return '<div class="c"><div class="wc"><div class="wi">'+ic+'</div><div class="wt">'+ti+'</div><div class="ws">'+tx+'</div></div></div>';
+}
+function nBadge(c){ return '<span class="nv '+(NV[c]?NV[c].cl:'')+'">' + c + '</span>'; }
+
+/* === TIMER === */
+function startTimer(){
+  if(tmrInt) clearInterval(tmrInt);
+  tmr = 0; tickTimer();
+  tmrInt = setInterval(tickTimer, 1000);
+}
+function tickTimer(){
+  tmr++;
+  var m = String(Math.floor(tmr/60)).padStart(2,'0');
+  var s = String(tmr%60).padStart(2,'0');
+  el('timerEl').textContent = m+':'+s;
+}
+
+/* === TABS === */
+function showTab(id){
+  document.querySelectorAll('.pan').forEach(function(p){ p.classList.remove('vis'); });
+  document.querySelectorAll('.tab').forEach(function(b){ b.classList.toggle('on', b.dataset.tab===id); });
+  el('tab-'+id).classList.add('vis');
+  if(id==='rcp') renderRCP();
+}
+
+/* === NIV BOX === */
+function setNiv(pfx, codi, urgent){
+  var cfg = NV[codi]; if(!cfg) return;
+  var box = el(pfx+'nb');
+  box.style.background  = cfg.bg;
+  box.style.borderColor = cfg.bc;
+  el(pfx+'nl').textContent = urgent ? '\u26a1 N1 URGENT' : cfg.lb;
+  el(pfx+'nl').style.color  = cfg.tc;
+  el(pfx+'nc').textContent  = codi;
+  el(pfx+'nc').style.color  = cfg.tc;
+  el(pfx+'nd').textContent  = cfg.dc;
+  el(pfx+'nd').style.color  = cfg.tc;
+  var btn = el(pfx+'bc'); if(btn) btn.style.display = 'block';
+}
+function resetNiv(pfx){
+  var box = el(pfx+'nb'); if(!box) return;
+  box.style.background  = '';
+  box.style.borderColor = 'var(--bd)';
+  el(pfx+'nl').textContent = 'Pendent';
+  el(pfx+'nl').style.color  = 'var(--txm)';
+  el(pfx+'nc').textContent  = '\u2014';
+  el(pfx+'nc').style.color  = 'var(--txm)';
+  el(pfx+'nd').textContent  = 'Selecciona el motiu de consulta';
+  el(pfx+'nd').style.color  = 'var(--txm)';
+  var btn = el(pfx+'bc'); if(btn) btn.style.display = 'none';
+}
+
+/* === NOVA TRUCADA === */
+function novaTrucada(){
+  if(!confirm('Iniciar nova trucada? Es perdran les dades actuals.')) return;
+  tMot=null; tNiv=null; aMot=null; aRes={}; aNiv=null;
+  rVic=null; rRun=false; rBeat=0; rStep=0; rChk=false;
+  if(rHrtInt){ clearInterval(rHrtInt); rHrtInt=null; }
+  resetNiv('t'); resetNiv('a');
+  document.querySelectorAll('#alList input, #rkList input').forEach(function(i){ i.checked=false; });
+  el('alAlert').style.display = 'none';
+  document.querySelectorAll('.f0b').forEach(function(b){ b.className='f0b'; });
+  document.querySelectorAll('.f0a').forEach(function(a){ a.style.display='none'; });
+  document.querySelectorAll('[data-tmid]').forEach(function(b){ b.classList.remove('sel'); });
+  document.querySelectorAll('[data-amid]').forEach(function(b){ b.classList.remove('sel'); });
+  el('protArea').innerHTML = wHtml('\ud83d\udcde','Selecciona el motiu de consulta','Completa la Fase 0 i selecciona el s\u00edmptoma per iniciar el protocol.');
+  el('aAnam').innerHTML = wHtml('\ud83c\udfaf','Selecciona el motiu de consulta','Apareixer\u00e0n les preguntes gu\u00edades per fases cl\u00edniques.');
+  el('aProg').innerHTML = '';
+  el('aResCard').style.display = 'none';
+  renderRCP();
+  startTimer();
+}
+
+/* === TRIATGE FASE 0 === */
+function initF0(){
+  var grid = el('f0Grid');
+  PROTO.fase0.preguntes.forEach(function(p){
+    var card = document.createElement('div');
+    card.className = 'f0c';
+    var hint = p.hint ? '<div class="f0h">\u2139\ufe0f '+p.hint+'</div>' : '';
+    card.innerHTML = '<div class="f0q">'+p.q+'</div>'+hint
+      +'<div id="f0o-'+p.id+'"></div>'
+      +'<div class="f0a" id="f0a-'+p.id+'"></div>';
+    grid.appendChild(card);
+    var opts = card.querySelector('#f0o-'+p.id);
+    p.respostes.forEach(function(r){
+      var btn = document.createElement('button');
+      btn.className = 'f0b';
+      var dot = r.nivell==='N1'?'\ud83d\udd34':r.nivell==='N2'?'\ud83d\udfe0':'\ud83d\udfe2';
+      btn.textContent = dot+' '+r.label;
+      btn.addEventListener('click', function(){
+        opts.querySelectorAll('.f0b').forEach(function(b){ b.className='f0b'; });
+        btn.classList.add(r.nivell==='N1'?'sn1':r.nivell==='N2'?'sn2':'sok');
+        var ac = el('f0a-'+p.id);
+        ac.style.display = 'block';
+        ac.textContent = r.accio;
+        ac.style.background = r.nivell==='N1'?'var(--n1-bg)':r.nivell==='N2'?'var(--n2-bg)':'var(--n4-bg)';
+        ac.style.color = r.nivell==='N1'?'var(--n1-tx)':r.nivell==='N2'?'var(--n2-tx)':'var(--n4-tx)';
+        ac.style.borderRadius='4px'; ac.style.padding='4px 8px';
+        if(r.nivell){ setNiv('t', r.nivell, r.nivell==='N1'); tNiv=r.nivell; }
+      });
+      opts.appendChild(btn);
+    });
+  });
+}
+
+/* === TRIATGE ALARMES + RISKS === */
+function initAlarmes(){
+  var list = el('alList');
+  ALARMES.forEach(function(a,i){
+    var lbl = document.createElement('label');
+    lbl.className = 'al-item';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.id = 'al'+i;
+    cb.addEventListener('change', function(){
+      var any = [...document.querySelectorAll('#alList input')].some(function(c){ return c.checked; });
+      el('alAlert').style.display = any?'block':'none';
+      if(any){ setNiv('t','N1',true); tNiv='N1'; }
+    });
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(' '+a));
+    list.appendChild(lbl);
+  });
+}
+function initRisks(){
+  var cont = el('rkList');
+  RISKS.forEach(function(r){
+    var lbl = document.createElement('label');
+    lbl.className = 'rk';
+    var cb = document.createElement('input'); cb.type='checkbox';
+    cb.style.marginTop='2px'; cb.style.accentColor='var(--yel-dk)'; cb.style.flexShrink='0';
+    lbl.appendChild(cb);
+    var txt = document.createElement('span');
+    txt.innerHTML = '<strong>'+r.lb+'</strong><br><span style="color:var(--txm);font-size:10px">'+r.ht+'</span>';
+    lbl.appendChild(txt);
+    cont.appendChild(lbl);
+  });
+}
+
+/* === TRIATGE MOTIUS === */
+function renderMotiusT(filtre){
+  var cont = el('motiuCont');
+  cont.innerHTML = '';
+  Object.keys(GRUPS).forEach(function(gid){
+    var ms = PROTO.motius.filter(function(m){
+      return m.grup===gid && (!filtre || m.label.toLowerCase().includes(filtre.toLowerCase()));
+    });
+    if(!ms.length) return;
+    var gl = document.createElement('div');
+    gl.className = 'gl';
+    gl.textContent = GRUPS[gid];
+    cont.appendChild(gl);
+    var grid = document.createElement('div');
+    grid.className = 'mg';
+    ms.forEach(function(m){
+      var btn = document.createElement('button');
+      btn.className = 'mb'+(m.fhq?' fhq':'')+(tMot===m.id?' sel':'');
+      btn.dataset.tmid = m.id;
+      btn.innerHTML = '<span class="mi">'+m.icon+'</span>'
+        +'<span style="font-size:9px;color:var(--txm);font-weight:700">'+m.num+'</span>'
+        +'<span class="mn">'+m.label+'</span>'
+        +(m.fhq?'<span class="fhq-t">FHQ</span>':'');
+      btn.addEventListener('click', function(){ selMotiuT(m.id); });
+      grid.appendChild(btn);
+    });
+    cont.appendChild(grid);
+  });
+  if(!cont.children.length){
+    var em = document.createElement('div');
+    em.style.cssText = 'padding:20px;text-align:center;color:var(--txm);font-size:13px';
+    em.textContent = 'Cap motiu trobat.';
+    cont.appendChild(em);
+  }
+}
+
+function selMotiuT(id){
+  tMot = id;
+  renderMotiusT(el('searchInp').value);
+
+  // Trobar el motiu a la llista
+  var m = PROTO.motius.find(function(x){ return x.id===id; });
+  if(!m){
+    el('protArea').innerHTML = wHtml('\ud83d\udccc','Motiu no trobat','Error intern.');
+    return;
+  }
+
+  // L'estructura real del JSON té 'criteris' (no priority/resource/steps)
+  var criteris = m.criteris || [];
+  if(!criteris.length){
+    el('protArea').innerHTML = wHtml('\ud83d\udcde','Consulta directa','Per a PCR, utilitza el m\u00f2dul RCP.');
+    showTab('rcp');
+    return;
+  }
+
+  // Determinar el nivell m\u00e0xim dels criteris (orientatiu)
+  var ORD = ['N1','N2','N3','N4','N5'];
+  var nivMax = criteris.reduce(function(acc, c){
+    if(!acc) return c.nivell;
+    return ORD.indexOf(c.nivell) < ORD.indexOf(acc) ? c.nivell : acc;
+  }, null) || 'N3';
+  setNiv('t', nivMax, false); tNiv = nivMax;
+
+  // Colors per nivell (CSS vars)
+  var NV_CO = {N1:'var(--n1-co)',N2:'var(--n2-co)',N3:'var(--n3-co)',N4:'var(--n4-co)',N5:'var(--n5-co)'};
+  var NV_BG = {N1:'var(--n1-bg)',N2:'var(--n2-bg)',N3:'var(--n3-bg)',N4:'var(--n4-bg)',N5:'var(--n5-bg)'};
+  var NV_TX = {N1:'var(--n1-tx)',N2:'var(--n2-tx)',N3:'var(--n3-tx)',N4:'var(--n4-tx)',N5:'var(--n5-tx)'};
+  var NV_BR = {N1:'var(--n1-br)',N2:'var(--n2-br)',N3:'var(--n3-br)',N4:'var(--n4-br)',N5:'var(--n5-br)'};
+  var NV_LB = {N1:'N1 \u2014 Immediat',N2:'N2 \u2014 Urgent',N3:'N3 \u2014 Urgent demorat',N4:'N4 \u2014 Poc urgent',N5:'N5 \u2014 No urgent'};
+  var REC   = {N1:{ic:'\ud83d\ude91',tx:'SVA urgent'},N2:{ic:'\ud83d\ude91',tx:'SVA / SVB'},N3:{ic:'\ud83d\ude97',tx:'SVB / Valoraci\u00f3 m\u00e8dica'},N4:{ic:'\ud83d\udcde',tx:'Consell telef\u00f2nic / CAP'},N5:{ic:'\ud83d\udcac',tx:'Consell sanit\u00e0ri'}};
+
+  var html = '<div style="display:flex;flex-direction:column;gap:10px">';
+
+  // Capçalera del motiu
+  html += '<div class="c">';
+  html += '<div style="padding:12px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bd)">';
+  html += '<span style="font-size:32px">'+m.icon+'</span>';
+  html += '<div><div style="font-size:15px;font-weight:700">'+m.num+' \u2014 '+m.label+'</div>';
+  if(m.fhq) html += '<span style="font-size:11px;background:var(--yel-lt);color:var(--yel-dk);border:1px solid var(--yel-br);border-radius:4px;padding:2px 8px;font-weight:700">\u23f1 First Hour Quintet</span>';
+  html += '</div></div>';
+
+  // Recurs orientatiu
+  html += '<div style="padding:10px 12px">';
+  var rec = REC[nivMax]||REC.N3;
+  html += '<div style="background:'+NV_BG[nivMax]+';border:2px solid '+NV_CO[nivMax]+';border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;margin-bottom:10px">';
+  html += '<span style="font-size:26px">'+rec.ic+'</span>';
+  html += '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:'+NV_TX[nivMax]+'">Recurs orientatiu</div>';
+  html += '<div style="font-size:14px;font-weight:700;color:'+NV_TX[nivMax]+'">'+rec.tx+'</div></div></div>';
+
+  // Instrucció
+  html += '<div class="ib ii" style="margin-bottom:10px">\u2139\ufe0f <span>Selecciona el criteri que descriu millor la presentaci\u00f3 del pacient. El nivell s\'actualitzar\u00e0 autom\u00e0ticament.</span></div>';
+
+  // Criteris — un per un, seleccionables
+  criteris.forEach(function(c, ci){
+    var niv = c.nivell || 'N3';
+    html += '<div style="border:1px solid '+NV_BR[niv]+';border-radius:8px;overflow:hidden;margin-bottom:6px;cursor:pointer" id="crit-'+id+'-'+ci+'" onclick="selCriteri(\''+id+'\','+ci+')">';
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--gr)">';
+    html += '<span class="nv '+NV[niv].cl+'">'+niv+'</span>';
+    html += '<span style="font-size:12px;font-weight:600;flex:1;color:var(--tx)">'+c.desc+'</span>';
+    html += '<span style="color:var(--txm);font-size:14px" id="crit-arr-'+id+'-'+ci+'">\u25be</span>';
+    html += '</div>';
+    html += '<div style="display:none;padding:10px 12px;border-top:1px solid var(--bd);flex-direction:column;gap:8px" id="crit-body-'+id+'-'+ci+'">';
+    if(c.detall) html += '<div style="font-size:11px;color:var(--tx2);font-style:italic">'+c.detall+'</div>';
+    html += '<div class="pai-box"><div class="pai-tt">\ud83d\udcde PAI \u2014 Instrucci\u00f3 pre-arribada</div><div class="pai-tx">'+c.pai+'</div></div>';
+    html += '<div style="display:flex;align-items:center;gap:8px"><span class="nv '+NV[niv].cl+'">'+niv+'</span><span style="font-size:9px;color:var(--txm);background:var(--gr);border:.5px solid var(--bd);border-radius:3px;padding:1px 5px">\ud83d\udcda '+c.ref+'</span></div>';
+    html += '<button class="bp" onclick="assignarNivell(\''+niv+'\');event.stopPropagation()">\u2713 Assignar '+niv+' a aquesta trucada</button>';
+    html += '</div></div>';
+  });
+
+  html += '</div></div>';
+
+  // Observacions
+  html += '<div class="c"><div class="ch">\ud83d\udcdd Observacions</div>';
+  html += '<div class="cb"><textarea class="obs" placeholder="Notes, decisions cl\u00edniques, derivaci\u00f3 acordada..."></textarea></div>';
+  html += '<div class="ac"><button class="bp" id="btnFT">\u2713 Finalitzar trucada</button><button class="bs" onclick="window.print()">\ud83d\udda8 Imprimir</button></div></div>';
+  html += '</div>';
+
+  el('protArea').innerHTML = html;
+  el('protArea').scrollIntoView({behavior:'smooth',block:'start'});
+  el('btnFT').addEventListener('click', function(){
+    if(tmrInt) clearInterval(tmrInt);
+    alert('Trucada finalitzada.\nDurada: '+el('timerEl').textContent+'\nNivell: '+(tNiv||'\u2014')+'\n\nRecorda registrar l\'incident al Chronos.');
+  });
+}
+
+// Expandir/col·lapsar criteri i assignar nivell orientatiu
+function selCriteri(mid, ci){
+  var body = el('crit-body-'+mid+'-'+ci);
+  var arr  = el('crit-arr-'+mid+'-'+ci);
+  if(!body) return;
+  var open = body.style.display === 'flex';
+  // Tanca tots els altres
+  document.querySelectorAll('[id^="crit-body-'+mid+'"]').forEach(function(b){ b.style.display='none'; });
+  document.querySelectorAll('[id^="crit-arr-'+mid+'"]').forEach(function(a){ if(a) a.textContent='\u25be'; });
+  if(!open){
+    body.style.display = 'flex';
+    if(arr) arr.textContent = '\u25b4';
+  }
+}
+
+function assignarNivell(niv){
+  setNiv('t', niv, niv==='N1'); tNiv=niv;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+/* === ANAMNESI MOTIUS === */
+function initMotiusA(){
+  var grid = el('aMotiuGrid');
+  MOTIUS_A.forEach(function(m){
+    var btn = document.createElement('button');
+    btn.className = 'mb';
+    btn.dataset.amid = m.id;
+    btn.innerHTML = '<span class="mi">'+m.ic+'</span><span class="mn">'+m.nm+'</span>';
+    btn.addEventListener('click', function(){
+      if(m.rcp){ showTab('rcp'); return; }
+      selMotiuA(m.id);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function selMotiuA(id){
+  aMot=id; aRes={}; aNiv=null;
+  document.querySelectorAll('[data-amid]').forEach(function(b){ b.classList.toggle('sel', b.dataset.amid===id); });
+  resetNiv('a');
+  renderAnam();
+  renderProgA();
+  el('aResCard').style.display = 'none';
+}
+
+/* === ANAMNESI RENDER === */
+function renderAnam(){
+  var motiu = ANAM.motius[aMot];
+  var area  = el('aAnam');
+  if(!motiu){ area.innerHTML=''; return; }
+
+  var html = '';
+  SECS.forEach(function(sec){
+    var data = motiu[sec.id];
+    if(!data||!data.length) return;
+    html += '<div class="c scc vis" id="asc-'+sec.id+'">';
+    html += '<div class="sc-hd" data-sec="'+sec.id+'">';
+    html += '<span class="sc-bg '+sec.bg+'">'+sec.lb+'</span>';
+    html += '<div><div class="sc-tt">'+sec.sb+'</div></div>';
+    html += '<span class="sc-ar">&#9662;</span></div>';
+    html += '<div class="sc-bd">';
+    if(sec.id==='descartar_vital') html += buildVital(data);
+    else if(sec.id==='opqrst')    html += buildOPQ(data);
+    else if(sec.id==='ample')     html += buildAMPLE(data);
+    else if(sec.id==='red_flags') html += buildFlags(data);
+    html += '</div></div>';
+  });
+
+  html += '<div class="c"><div class="ac">';
+  html += '<button class="bp" id="aBtnCalc">&#9650; Calcular nivell</button>';
+  html += '<button class="bs" id="aBtnRes">&#128196; Resum</button>';
+  html += '<button class="bs" id="aBtnRst">&#8635; Reset</button>';
+  html += '</div></div>';
+
+  area.innerHTML = html;
+
+  // Un sol listener per tot el panell d'anamnesi
+  area.addEventListener('click', function(e){
+    var sh = e.target.closest('.sc-hd');
+    if(sh){ sh.closest('.scc').classList.toggle('co'); return; }
+    var vb = e.target.closest('.vb');
+    if(vb){ onVital(vb); return; }
+    var ob = e.target.closest('.ob[data-pid]');
+    if(ob){ onOpt(ob); return; }
+    var fr = e.target.closest('.fr');
+    if(fr && e.target.tagName!=='INPUT'){ togFR(fr); return; }
+    if(e.target.id==='aBtnCalc') calcNivA();
+    if(e.target.id==='aBtnRes')  mostrarRes();
+    if(e.target.id==='aBtnRst')  resetA();
+  });
+  area.addEventListener('change', function(e){
+    if(e.target.classList.contains('fc')){
+      syncFR(e.target.closest('.fr'));
+      calcNivA(); updateProgA();
+    }
+  });
+}
+
+function buildVital(data){
+  var h = '<div class="ib id" style="margin-bottom:8px">&#9889; <span><strong>Respon S&Iacute;/NO.</strong> Si alarma positiva &#8594; N1 immediatament.</span></div>';
+  data.forEach(function(p){
+    var fsi=p.si==='N1', fno=p.no==='N1';
+    h += '<div class="vq"><div class="vqh">';
+    h += '<div class="vqt">&#128308; '+p.q+'</div>';
+    if(p.alerta) h += '<div class="vqa">&#9889; '+p.alerta+'</div>';
+    h += '</div><div class="vo">';
+    h += '<button class="vb '+(fsi?'vsif':'vsi')+'" data-vid="'+p.id+'" data-vr="si" data-vf="'+(fsi?1:0)+'">&#10003; S&iacute;</button>';
+    h += '<button class="vb '+(fno?'vnof':'vno')+'" data-vid="'+p.id+'" data-vr="no" data-vf="'+(fno?1:0)+'">&#10007; No</button>';
+    h += '</div></div>';
+  });
+  return h;
+}
+
+function buildOPQ(data){
+  var h = '';
+  data.forEach(function(p){
+    h += '<div class="pb"><div class="ph">';
+    h += '<div class="pl">'+p.lletra+'</div>';
+    h += '<div><div class="pq">'+p.nom+' &mdash; '+p.q+'</div>';
+    if(p.hint) h += '<div class="pi">&#8505;&#65039; '+p.hint+'</div>';
+    h += '</div></div><div class="po">';
+    p.opcions.forEach(function(o,oi){
+      var ic = o.flag==='N1'?'&#128308;':o.flag==='N2'?'&#128992;':o.flag==='N3'?'&#128993;':'&#9898;';
+      h += '<button class="ob" data-pid="'+p.id+'" data-oi="'+oi+'" data-flag="'+(o.flag||'')+'" data-pes="'+o.pes+'" data-lbl="'+encodeURIComponent(o.label)+'">';
+      h += '<span class="oi">'+ic+'</span><div>'+o.label;
+      if(o.nota) h += '<span class="on">&#128172; '+o.nota+'</span>';
+      h += '</div></button>';
+    });
+    h += '</div></div>';
+  });
+  return h;
+}
+
+function buildAMPLE(data){
+  var h = '';
+  data.forEach(function(p){
+    h += '<div class="pb"><div class="ph">';
+    h += '<div class="pl la">'+p.lletra+'</div>';
+    h += '<div class="pq">'+p.nom+' &mdash; '+p.q+'</div>';
+    h += '</div><div class="po">';
+    p.opcions.forEach(function(o,oi){
+      var ic = o.flag==='N1'?'&#128308;':o.flag==='N2'?'&#128992;':'&#9898;';
+      h += '<button class="ob" data-pid="'+p.id+'" data-oi="'+oi+'" data-flag="'+(o.flag||'')+'" data-pes="'+o.pes+'" data-lbl="'+encodeURIComponent(o.label)+'">';
+      h += '<span class="oi">'+ic+'</span><div>'+o.label;
+      if(o.nota) h += '<span class="on">&#128172; '+o.nota+'</span>';
+      h += '</div></button>';
+    });
+    h += '</div></div>';
+  });
+  return h;
+}
+
+function buildFlags(data){
+  var h = '<div class="ib iw" style="margin-bottom:8px">&#9888;&#65039; <span>Marca els signes d\'alarma presents. Cada positiu puja el risc.</span></div>';
+  data.forEach(function(f){
+    h += '<div class="fr" data-fid="'+f.id+'" data-ff="'+f.flag+'" data-fn="'+encodeURIComponent(f.nota||'')+'">';
+    h += '<input type="checkbox" class="fc" id="fc-'+f.id+'">';
+    h += '<div class="ft">'+f.q;
+    if(f.nota) h += '<span class="fn2">&#8594; '+f.nota+'</span>';
+    h += '</div><span class="fp '+(f.flag==='N1'?'fp1':'fp2')+'">'+f.flag+'</span></div>';
+  });
+  return h;
+}
+
+/* === HANDLERS ANAMNESI === */
+function onVital(btn){
+  var vid=btn.dataset.vid, vr=btn.dataset.vr, ef=btn.dataset.vf==='1';
+  btn.closest('.vo').querySelectorAll('.vb').forEach(function(b){ b.classList.remove('ak','aok'); });
+  btn.classList.add(ef?'ak':'aok');
+  aRes[vid] = {flag:ef?'N1':null, pes:ef?3:0, label:vr==='si'?'S\u00ed':'No'};
+  if(ef){ showFlagA("Resposta positiva a pregunta d'exclusi\u00f3 vital"); setNiv('a','N1',true); aNiv='N1'; }
+  updateProgA();
+}
+
+function onOpt(btn){
+  var pid=btn.dataset.pid, flag=btn.dataset.flag||null, pes=parseInt(btn.dataset.pes)||0, lbl=decodeURIComponent(btn.dataset.lbl);
+  btn.closest('.po').querySelectorAll('.ob').forEach(function(b){ b.classList.remove('os','of'); });
+  btn.classList.add(flag==='N1'?'of':'os');
+  aRes[pid] = {flag:flag, pes:pes, label:lbl};
+  calcNivA(); updateProgA();
+}
+
+function togFR(row){
+  var cb = row.querySelector('.fc');
+  cb.checked = !cb.checked;
+  syncFR(row); calcNivA(); updateProgA();
+}
+function syncFR(row){
+  var fid=row.dataset.fid, ff=row.dataset.ff, fn=decodeURIComponent(row.dataset.fn||'');
+  var cb = row.querySelector('.fc');
+  if(cb.checked){ aRes['rf_'+fid]={flag:ff, pes:ff==='N1'?3:2, label:fn}; showFlagA(fn); }
+  else delete aRes['rf_'+fid];
+}
+function showFlagA(msg){
+  var e=el('aFlag'); el('aFlagMsg').textContent=msg; e.style.display='block';
+  clearTimeout(e._t); e._t=setTimeout(function(){ e.style.display='none'; },6000);
+}
+
+function calcNivA(){
+  var ORD = ['N1','N2','N3','N4','N5'];
+  var maxF = null;   // flag directe (descart vital o red flag greu)
+  var flagN2 = false; // flag de nivell N2 (menys urgent)
+  var pes = 0;
+
+  Object.keys(aRes).forEach(function(key){
+    var r = aRes[key];
+    // Descarts vitals (prefixe 'dv') — activen nivell directe
+    if(key.startsWith('dv') || r.esFlag){
+      if(r.flag === 'N1'){
+        if(!maxF || ORD.indexOf('N1') < ORD.indexOf(maxF)) maxF = 'N1';
+      }
+      return; // no suma pesos
+    }
+    // Red flags (prefixe 'rf') — activen nivell directe però NO sempre N1
+    if(key.startsWith('rf_')){
+      var ff = r.flag;
+      if(ff && (!maxF || ORD.indexOf(ff) < ORD.indexOf(maxF))) maxF = ff;
+      return;
+    }
+    // OPQRST / AMPLE — sumen pesos gradualment (no activen nivell directe)
+    pes += r.pes || 0;
+  });
+
+  // Nivell per pesos (escala gradual, no massa agressiva)
+  var nPes = null;
+  if      (pes >= 12) nPes = 'N1';
+  else if (pes >= 8)  nPes = 'N2';
+  else if (pes >= 5)  nPes = 'N3';
+  else if (pes >= 2)  nPes = 'N4';
+  else if (pes >= 1)  nPes = 'N5';
+
+  // El nivell final és el més greu entre el flag directe i el calculat per pesos
+  var final = null;
+  if(maxF && nPes){
+    final = ORD.indexOf(maxF) < ORD.indexOf(nPes) ? maxF : nPes;
+  } else {
+    final = maxF || nPes;
+  }
+
+  if(final){ setNiv('a', final, final==='N1'); aNiv = final; }
+}
+
+
+function renderProgA(){
+  var list=el('aProg'); list.innerHTML='';
+  var motiu=ANAM.motius[aMot]; if(!motiu) return;
+  SECS.forEach(function(sec){
+    if(!motiu[sec.id]||!motiu[sec.id].length) return;
+    var div=document.createElement('div'); div.className='pi2'; div.id='ap-'+sec.id;
+    div.innerHTML='<span class="pd2"></span><span>'+sec.lb+'</span>';
+    div.onclick=function(){ var e=el('asc-'+sec.id); if(e) e.scrollIntoView({behavior:'smooth'}); };
+    list.appendChild(div);
+  });
+}
+function updateProgA(){
+  var motiu=ANAM.motius[aMot]; if(!motiu) return;
+  SECS.forEach(function(sec){
+    var data=motiu[sec.id]; if(!data) return;
+    var tot=data.length, resp=data.filter(function(p){ return aRes[p.id]||aRes['rf_'+p.id]; }).length;
+    var e=el('ap-'+sec.id); if(!e) return;
+    e.className='pi2 '+(resp===tot?'pd':resp>0?'pa':'');
+    e.querySelector('span:last-child').textContent = resp===tot?sec.lb+' \u2713':resp>0?sec.lb+' ('+resp+'/'+tot+')':sec.lb;
+  });
+}
+
+function mostrarRes(){
+  var motiu=ANAM.motius[aMot]; if(!motiu) return;
+  var h='<div style="font-size:12px;display:flex;flex-direction:column;gap:5px">';
+  h+='<div style="display:flex;gap:8px"><span style="color:var(--txm);min-width:80px">Motiu:</span><strong>'+motiu.nom+'</strong></div>';
+  h+='<div style="display:flex;gap:8px"><span style="color:var(--txm);min-width:80px">Nivell CDSS:</span><strong>'+(aNiv||'\u2014')+'</strong></div>';
+  Object.entries(aRes).forEach(function(e){ if(e[1].label) h+='<div style="display:flex;gap:8px"><span style="color:var(--txm);min-width:80px">'+e[0]+':</span><span>'+e[1].label+'</span></div>'; });
+  h+='</div>';
+  el('aResBody').innerHTML=h;
+  el('aResCard').style.display='block';
+  el('aResCard').scrollIntoView({behavior:'smooth'});
+}
+
+function resetA(){
+  aMot=null; aRes={}; aNiv=null;
+  document.querySelectorAll('[data-amid]').forEach(function(b){ b.classList.remove('sel'); });
+  el('aAnam').innerHTML=wHtml('\ud83c\udfaf','Selecciona el motiu de consulta','Apareixer\u00e0n les preguntes gu\u00edades per fases cl\u00edniques.');
+  el('aProg').innerHTML='';
+  el('aResCard').style.display='none';
+  resetNiv('a');
+}
+
+/* === RCP === */
+function renderRCP(){
+  var cont=el('rcpCont');
+  if(!rVic){ renderRCPSel(cont); return; }
+  if(rChk){ renderRCPBreath(cont); return; }
+  renderRCPActive(cont);
+}
+
+function renderRCPSel(cont){
+  cont.innerHTML='<div class="c"><div class="ch">&#128100; Quin tipus de v\u00edctima?</div><div style="padding:12px"><div class="vg" id="vGrid"></div></div></div>';
+  var grid=el('vGrid');
+  [{id:'adult',ic:'&#129473;',lb:'Adult',sb:'M\u00e9s de 8 anys'},
+   {id:'child',ic:'&#129410;',lb:'Nen',sb:'1 a 8 anys'},
+   {id:'infant',ic:'&#128118;',lb:'Lactant',sb:"Menys d'1 any"}
+  ].forEach(function(v){
+    var btn=document.createElement('button'); btn.className='vbtn';
+    btn.innerHTML='<div class="vi">'+v.ic+'</div><div class="vl">'+v.lb+'</div><div class="vs">'+v.sb+'</div>';
+    btn.addEventListener('click',function(){ rVic=v.id; rChk=true; rChkSec=10; renderRCP(); startChkTimer(); });
+    grid.appendChild(btn);
+  });
+}
+
+function startChkTimer(){
+  if(rChkInt) clearInterval(rChkInt); rChkSec=10;
+  rChkInt=setInterval(function(){
+    rChkSec--; var e=el('rcht'); if(e) e.textContent=rChkSec;
+    if(rChkSec<=0) clearInterval(rChkInt);
+  },1000);
+}
+
+function renderRCPBreath(cont){
+  cont.innerHTML='<div class="c"><div class="ch">&#128065; Comprova la respiraci\u00f3</div>'
+    +'<div style="padding:14px;display:flex;flex-direction:column;gap:12px">'
+    +'<div class="ib id">&#128226; <span>Inclina el cap enrere i aixeca la barbeta. Acosta la galta a la boca. Mira si el pit puja i baixa. <strong>10 segons.</strong></span></div>'
+    +'<div class="brc"><div class="brt" id="rcht">'+rChkSec+'</div><div class="brl">segons d\'observaci\u00f3</div></div>'
+    +'<div class="ib iw">&#9888;&#65039; <strong>Gasping (respiraci\u00f3 ag\u00f2nica):</strong> sorollosa, irregular, superficial. NO \u00e9s normal. Tractar com si NO respir\u00e9s.</div>'
+    +'<div style="font-size:15px;font-weight:700;text-align:center">Respira normalment?</div>'
+    +'<div class="ar"><button class="asi" id="rcpYes">&#10003; S\u00ed, respira normalment</button><button class="ano" id="rcpNo">&#10007; No respira / gasping</button></div>'
+    +'<button class="bs" style="width:100%" id="rcpBk">\u2190 Canviar v\u00edctima</button>'
+    +'</div></div>';
+  el('rcpYes').addEventListener('click',function(){
+    clearInterval(rChkInt); rChk=false;
+    cont.innerHTML='<div class="c"><div class="ch">&#10003; Respira</div><div style="padding:14px">'
+      +'<div class="ib ii">\ud83d\udee1\ufe0f <strong>El pacient respira.</strong> Col\u00b7loca\'l en posici\u00f3 lateral de seguretat i espera el recurs. Vigila que continu\u00ef respirant.</div>'
+      +'<button class="bs" style="width:100%;margin-top:12px" id="rcpBk2">\u2190 Tornar</button></div></div>';
+    el('rcpBk2').addEventListener('click',function(){ rVic=null; rChk=false; renderRCP(); });
+  });
+  el('rcpNo').addEventListener('click',function(){
+    clearInterval(rChkInt); rChk=false; rBeat=0; rStep=0; rRun=false; renderRCP();
+  });
+  el('rcpBk').addEventListener('click',function(){
+    clearInterval(rChkInt); rVic=null; rChk=false; renderRCP();
+  });
+}
+
+function renderRCPActive(cont){
+  var steps=RCP_STEPS[rVic]||RCP_STEPS.adult;
+  var isLast=rStep>=steps.length-1;
+  var titol={adult:'RCP \u2014 Adult / Nen >8 anys',child:'RCP \u2014 Nen (1\u20138 anys)',infant:'RCP \u2014 Lactant (<1 any)'}[rVic]||'RCP';
+  var mans={
+    adult:"Tal\u00f3 d'una m\u00e0 + l'altra a sobre \u00b7 Centre del pit \u00b7 Bra\u00e7os rectes \u00b7 5\u20136 cm",
+    child:"Tal\u00f3 d'una m\u00e0 \u00b7 Centre del pit \u00b7 Bra\u00e7os rectes \u00b7 4\u20135 cm",
+    infant:'2 dits (index i mig) \u00b7 Just per sota dels mugrons \u00b7 ~4 cm'
+  }[rVic]||'';
+  var sh='';
+  steps.forEach(function(s,i){
+    var cls=i<rStep?'sd':i===rStep?'sa':'';
+    sh+='<div class="si2 '+cls+'"><div class="sn2">'+(i<rStep?'\u2713':i+1)+'</div><div class="st"><strong>'+s.t+'</strong>'+s.b+'</div></div>';
+  });
+  cont.innerHTML='<div class="c"><div class="ch">&#9889; PCR CONFIRMADA \u2014 '+titol+'</div>'
+    +'<div style="padding:12px;display:flex;flex-direction:column;gap:12px">'
+    +'<div class="ib id">&#9889; <strong>PCR CONFIRMADA \u2014 INICIA RCP ARA</strong></div>'
+    +'<div class="hb">'
+      +'<svg class="hs" viewBox="0 0 100 90"><path class="hp" id="hrtPath" d="M50 85 C50 85 10 55 10 30 C10 15 22 5 35 5 C42 5 48 9 50 13 C52 9 58 5 65 5 C78 5 90 15 90 30 C90 55 50 85 50 85Z"/></svg>'
+      +'<div class="hr">100 \u2013 120</div><div class="hu">compressions/min</div>'
+      +'<div class="bc" id="rcpBeats">'+rBeat+'</div><div class="bl">compressions</div>'
+    +'</div>'
+    +'<div style="background:var(--yel-lt);border:1px solid var(--yel-br);border-radius:8px;padding:10px 12px">'
+      +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--yel-dk);margin-bottom:5px">&#129330; Posici\u00f3 de les mans</div>'
+      +'<div style="font-size:12px;color:var(--yel-tx)">'+mans+'</div>'
+    +'</div>'
+    +'<div class="sl">'+sh+'</div>'
+    +(!isLast?'<button class="bns" id="rcpNxt">\u2713 Fet \u2014 Pas seg\u00fcent</button>':'')
+    +'<div style="display:flex;gap:10px">'
+      +'<button class="brs" id="rcpTog">'+(rRun?'\u23f8 Pausar':'\u25b6 '+(rBeat>0?'Continuar':'Iniciar RCP'))+'</button>'
+      +'<button class="bs" id="rcpBk3">\u2190 Tornar</button>'
+    +'</div>'
+    +'</div></div>';
+  el('rcpTog').addEventListener('click',function(){ if(rRun) stopHrt(); else startHrt(); });
+  el('rcpBk3').addEventListener('click',function(){ rVic=null; rChk=false; stopHrt(); renderRCP(); });
+  if(!isLast && el('rcpNxt')){
+    el('rcpNxt').addEventListener('click',function(){ rStep++; renderRCPActive(cont); if(rRun) startHrt(); });
+  }
+  if(rRun) startHrt();
+}
+
+function startHrt(){
+  stopHrt(); rRun=true;
+  var btn=el('rcpTog'); if(btn) btn.textContent='\u23f8 Pausar';
+  rHrtInt=setInterval(function(){
+    rBeat++;
+    var e=el('rcpBeats'); if(e) e.textContent=rBeat;
+    var p=el('hrtPath'); if(!p) return;
+    p.style.transition='transform .08s ease-out'; p.style.transform='scale(1.18)';
+    setTimeout(function(){ if(p){ p.style.transition='transform .15s ease-in'; p.style.transform='scale(1)'; } },120);
+  }, Math.round(60000/110));
+}
+function stopHrt(){
+  rRun=false;
+  if(rHrtInt){ clearInterval(rHrtInt); rHrtInt=null; }
+  var btn=el('rcpTog'); if(btn) btn.textContent='\u25b6 '+(rBeat>0?'Continuar':'Iniciar RCP');
+}
+
+/* === INIT === */
+document.addEventListener('DOMContentLoaded', function(){
+  /* Timer */
+  startTimer();
+
+  /* Header buttons */
+  el('btnNova').addEventListener('click', novaTrucada);
+  el('tbc').addEventListener('click', function(){ if(tNiv) alert('Nivell '+tNiv+' confirmat.\nRecorda registrar-ho al Chronos.'); });
+  el('abc').addEventListener('click', function(){ if(aNiv) alert('Nivell '+aNiv+' confirmat.\nRecorda registrar-ho al Chronos.'); });
+  el('aCopyBtn').addEventListener('click', function(){
+    navigator.clipboard.writeText(el('aResBody').innerText).then(function(){ alert('Resum copiat!'); });
+  });
+
+  /* Tabs */
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.addEventListener('click', function(){ showTab(btn.dataset.tab); });
+  });
+
+  /* Search */
+  el('searchInp').addEventListener('input', function(){ renderMotiusT(this.value); });
+
+  /* Triatge */
+  initF0();
+  initAlarmes();
+  initRisks();
+  renderMotiusT('');
+
+  /* Anamnesi */
+  initMotiusA();
+
+  /* RCP */
+  renderRCP();
+});
+
+</script>
+</body>
+</html>
